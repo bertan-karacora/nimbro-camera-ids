@@ -1,6 +1,6 @@
 import setuptools
 
-NAME_PACKAGE = "nimbro-ids-ros2"
+NAME_PACKAGE = "camera_ids"
 
 setuptools.setup(
     name=NAME_PACKAGE,
@@ -18,7 +18,7 @@ setuptools.setup(
     license="MIT",
     entry_points={
         "console_scripts": [
-            "publish = nimbro-ids-ros2.publish_camera_ids:main",
+            # "publish = camera_ids.publish_camera_ids:main",
         ],
     },
 )

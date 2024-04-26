@@ -1,15 +1,12 @@
 <?xml version="1.0"?>
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
-  <name>nimbro-ids-ros2</name>
+  <name>camera_ids</name>
   <version>0.0.1</version>
   <description>ROS2 package for IDS camera</description>
   <maintainer email="bertan-karacora@gmail.com">Bertan Karacora</maintainer>
   <license>MIT</license>
 
-  <exec_depend>ids_peak</exec_depend>
-  <exec_depend>ids_peak_ipl</exec_depend>
-  <exec_depend>ids_peak_ipl</exec_depend>
   <exec_depend>rclpy</exec_depend>
   <exec_depend>std_msgs</exec_depend>
 
