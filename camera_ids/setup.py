@@ -18,7 +18,7 @@ setuptools.setup(
     license="MIT",
     entry_points={
         "console_scripts": [
-            # "publish = camera_ids.publish_camera_ids:main",
+            "publish = camera_ids.publish_camera_ids:main",
         ],
     },
 )
