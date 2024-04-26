@@ -4,8 +4,6 @@ import ids_peak.ids_peak as idsp
 import ids_peak_ipl.ids_peak_ipl as idsp_ipl
 import ids_peak.ids_peak_ipl_extension as idsp_extension
 
-from sensor_msgs.msg import Image
-
 # BayerGR8, BayerGR10g40IDS
 TARGET_PIXELFORMAT = idsp_ipl.PixelFormatName_BGRa8
 

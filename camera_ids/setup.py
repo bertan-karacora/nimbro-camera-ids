@@ -5,7 +5,7 @@ NAME_PACKAGE = "camera_ids"
 setuptools.setup(
     name=NAME_PACKAGE,
     version="0.0.1",
-    packages=setuptools.find_namespace_packages(),
+    packages=setuptools.find_namespace_packages(exclude=["resource"]),
     data_files=[
         ("share/ament_index/resource_index/packages", [f"resource/{NAME_PACKAGE}"]),
         (f"share/{NAME_PACKAGE}", ["package.xml"]),

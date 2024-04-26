@@ -1,6 +1,6 @@
 import rclpy
 
-from camera_ids_publisher import CameraIDSPublisher
+from camera_ids.camera_ids_publisher import CameraIDSPublisher
 
 
 def main(args=None):
