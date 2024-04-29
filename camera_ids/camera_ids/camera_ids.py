@@ -4,7 +4,6 @@ import ids_peak.ids_peak as idsp
 import ids_peak_ipl.ids_peak_ipl as idsp_ipl
 import ids_peak.ids_peak_ipl_extension as idsp_extension
 
-# BayerGR8, BayerGR10g40IDS
 TARGET_PIXELFORMAT = idsp_ipl.PixelFormatName_BGRa8
 
 
@@ -195,68 +194,3 @@ class CameraIDS:
     def is_acquiring(self):
         is_it = self._acquiring
         return is_it
-
-    # def record(self, t_seconds: int):
-    #     # Create video writing object
-    #     video = idsp_ipl.VideoWriter()
-    #     cwd = os.getcwd()
-
-    #     dropped_before = 0
-    #     lost_before = 0
-
-    #     try:
-    #         # Create a new file the video will be saved in.
-    #         video.Open(self._valid_name(cwd + "/" + "video", ".avi"))
-
-    #         # Set target frame rate and gain
-    #         self.set_remote_device_value("AcquisitionFrameRate", self.target_fps)
-    #         self.set_remote_device_value("Gain", self.target_gain)
-
-    #         video.Container().SetFramerate(self.target_fps)
-
-    #         print("Recording with: ")
-    #         var_name = "AcquisitionFrameRate"
-    #         print(f"  Framerate: {self._nodemap.FindNode(var_name).Value():.2f}")
-    #         var_name = "Gain"
-    #         print(f"  Gain: {self._nodemap.FindNode(var_name).Value():.2f}")
-    #         data_stream_nodemap = self._datastream.NodeMaps()[0]
-    #         dropped_before = data_stream_nodemap.FindNode("StreamDroppedFrameCount").Value()
-    #         lost_before = data_stream_nodemap.FindNode("StreamLostFrameCount").Value()
-
-    #     except Exception as e:
-    #         print(str(e))
-    #         raise
-
-    #     limit = timer + time.time()
-    #     while (limit - time.time()) > 0 and not self.killed:
-    #         buffer = self._datastream.WaitForFinishedBuffer(5000)
-    #         ipl_image = idsp_extension.BufferToImage(buffer)
-    #         converted_ipl_image = self._image_converter.Convert(ipl_image, TARGET_PIXEL_FORMAT)
-
-    #         # Append image to video
-    #         video.Append(converted_ipl_image)
-    #         # Give buffer back into the queue so it can be used again
-    #         self._datastream.QueueBuffer(buffer)
-
-    #     if self.killed:
-    #         return
-
-    #     # See if the acquisition was lossless. Note that between the last
-    #     # acquisition and the next acquisition some frames will be lost
-    #     # (seen after the second recording).
-    #     data_stream_nodemap = self._datastream.NodeMaps()[0]
-    #     dropped_stream_frames = data_stream_nodemap.FindNode("StreamDroppedFrameCount").Value() - dropped_before
-    #     lost_stream_frames = data_stream_nodemap.FindNode("StreamLostFrameCount").Value() - lost_before
-
-    #     frames_encoded = video.NumFramesEncoded()
-    #     frames_video_dropped = video.NumFramesDropped()
-
-    #     fps = self.frames_encoded / self.duration
-
-    #     # AVI framerate sets the playback speed.
-    #     # You can calculate that with the amount of frames captured in the
-    #     # time duration the video was recorded
-    #     video.Container().SetFramerate(fps)
-    #     # Wait until all frames are written to the file
-    #     video.WaitUntilFrameDone(10000)
-    #     video.Close()

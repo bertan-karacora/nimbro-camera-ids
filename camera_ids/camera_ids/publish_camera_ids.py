@@ -6,8 +6,8 @@ from camera_ids.camera_ids_publisher import CameraIDSPublisher
 def main(args=None):
     rclpy.init(args=args)
 
-    minimal_publisher = CameraIDSPublisher()
-    rclpy.spin(minimal_publisher)
+    publisher = CameraIDSPublisher()
+    rclpy.spin(publisher)
 
     rclpy.shutdown()
 
