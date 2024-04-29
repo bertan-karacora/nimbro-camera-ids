@@ -4,6 +4,7 @@ import importlib.resources
 from cv_bridge import CvBridge
 import ids_peak.ids_peak as idsp
 from rclpy.node import Node
+from sensor_msgs.msg import Image
 
 from camera_ids.camera_ids import CameraIDS
 
@@ -36,11 +37,11 @@ class CameraIDSPublisher(Node):
         self.camera.start_acquisition()
         self.camera.start_capturing()
 
-        # self.bridge = CvBridge()
-        # self.counter = 0
-        # fps = 30
-        # self.timer = self.create_timer(1.0 / fps, self.timer_callback)
-        # self.publisher = self.create_publisher(Image, "camera_ids", 10)
+        self.bridge = CvBridge()
+        self.counter = 0
+        fps = 30
+        self.timer = self.create_timer(1.0 / fps, self.timer_callback)
+        self.publisher = self.create_publisher(Image, "camera_ids", 10)
 
     def print_device_info(device_descriptor):
         name_model = device_descriptor.ModelName()

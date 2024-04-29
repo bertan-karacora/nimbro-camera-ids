@@ -10,6 +10,8 @@ setuptools.setup(
         ("share/ament_index/resource_index/packages", [f"resource/{NAME_PACKAGE}"]),
         (f"share/{NAME_PACKAGE}", ["package.xml"]),
     ],
+    package_data={f"{NAME_PACKAGE}": [f"configs/*.cset"]},
+    include_package_data=True,
     install_requires=["setuptools"],
     zip_safe=True,
     maintainer="Bertan Karacora",
@@ -18,7 +20,7 @@ setuptools.setup(
     license="MIT",
     entry_points={
         "console_scripts": [
-            "publish = camera_ids.publish_camera_ids:main",
+            f"publish = {NAME_PACKAGE}.scripts.publish_camera_ids:main",
         ],
     },
 )

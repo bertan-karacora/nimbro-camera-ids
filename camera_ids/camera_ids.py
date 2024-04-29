@@ -148,6 +148,13 @@ class CameraIDS:
         if value in available_entries:
             self._nodemap.FindNode(name).SetCurrentEntry(value)
 
+    def execute(self, command):
+        self._nodemap.FindNode(command).Execute()
+        self._nodemap.FindNode(command).WaitUntilDone()
+
+    def reset(self):
+        self.execute("ResetToFactoryDefaults")
+
     def load_settings(self, path):
         self._nodemap.LoadFromFile(str(path))
 
