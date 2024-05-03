@@ -1,5 +1,6 @@
 import importlib
 import importlib.resources
+import sys
 
 from cv_bridge import CvBridge
 import ids_peak.ids_peak as idsp
@@ -9,7 +10,7 @@ from sensor_msgs.msg import Image
 from camera_ids.camera_ids import CameraIDS
 
 
-class CameraIDSPublisher(Node):
+class NodeCameraIDS(Node):
     def __init__(self, config_camera="default"):
         super().__init__("camera_ids_publisher")
         self.bridge = None
@@ -35,7 +36,6 @@ class CameraIDSPublisher(Node):
         self.camera.load_settings(path_config)
 
         self.camera.start_acquisition()
-        self.camera.start_capturing()
 
         self.bridge = CvBridge()
         self.counter = 0
@@ -60,7 +60,7 @@ class CameraIDSPublisher(Node):
 
         if device_descriptors.empty() or len(device_descriptors) <= id_device:
             print("No device found.")
-            return
+            sys.exit()
 
         device = device_descriptors[id_device].OpenDevice(idsp.DeviceAccessType_Control)
         return device
