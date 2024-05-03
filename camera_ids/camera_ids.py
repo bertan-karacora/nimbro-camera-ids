@@ -177,6 +177,7 @@ class CameraIDS:
         return image_converted
 
     def start_capturing(self):
+        self.start_acquisition()
         self.capturing_threaded = True
         self.capturing_thread.start()
 
@@ -185,6 +186,7 @@ class CameraIDS:
         self.capturing_thread.join()
         self.killed = False
         self.capturing_threaded = False
+        self.stop_acquisition()
 
     def capture_threaded(self):
         while not self.killed:
