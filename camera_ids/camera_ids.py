@@ -1,4 +1,5 @@
 import threading
+import time
 
 import ids_peak.ids_peak as idsp
 import ids_peak_ipl.ids_peak_ipl as idsp_ipl
@@ -15,6 +16,8 @@ class CameraIDS:
         self.capturing_thread = None
         self.capturing_threaded = None
         self.datastream = None
+        self.fps = None
+        self.image = None
         self.image_converter = None
         self.killed = None
         self.nodemap = None
@@ -23,7 +26,6 @@ class CameraIDS:
 
     def __del__(self):
         self.close()
-        self.reset()
 
     def __repr__(self):
         r = f"{__package__}.{self.__class__.__name__}({self.device})"
@@ -38,85 +40,8 @@ class CameraIDS:
         s = f"{name_model} ({name_interface} ; {name_system} v.{version_system})"
         return s
 
-    def _initialize(self):
-        self.acquiring = False
-        self.killed = False
-        self.capturing_threaded = False
-
-        self.nodemap = self.device.RemoteDevice().NodeMaps()[0]
-        self.image_converter = idsp_ipl.ImageConverter()
-        self.datastream = self.setup_datastream()
-
-        # TODO: Change from iterated capture calls to threading
-        # self.capturing_thread = threading.Thread(target=self.capture_threaded, args=())
-
-    def setup_datastream(self):
-        datastream = self.device.DataStreams()[0].OpenDataStream()
-
-        payload_size = self.nodemap.FindNode("PayloadSize").Value()
-
-        num_buffers = datastream.NumBuffersAnnouncedMinRequired()
-        for _ in range(num_buffers):
-            buffer = datastream.AllocAndAnnounceBuffer(payload_size)
-            datastream.QueueBuffer(buffer)
-
-        return datastream
-
-    def _close_buffers(self):
-        if self.datastream is not None:
-            for buffer in self.datastream.AnnouncedBuffers():
-                self.datastream.RevokeBuffer(buffer)
-
-    def _preallocate_buffers(self):
-        image_width = self.get_value("Width")
-        image_height = self.get_value("Height")
-        input_pixelformat = idsp_ipl.PixelFormat(self.get_entry("PixelFormat"))
-
-        # Pre-allocate conversion buffers to speed up first image conversion while the acquisition is running
-        # NOTE: Re-create the image converter, so old conversion buffers get freed
-        self.image_converter = idsp_ipl.ImageConverter()
-        self.image_converter.PreAllocateConversion(input_pixelformat, TARGET_PIXELFORMAT, image_width, image_height)
-
-    def start_acquisition(self):
-        if self.acquiring:
-            return
-
-        max_framerate = self.get_max("AcquisitionFrameRate")
-        self.set_value("AcquisitionFrameRate", max_framerate)
-
-        # Lock parameters that should not be accessed during acquisition
-        self.set_value("TLParamsLocked", 1)
-
-        self._preallocate_buffers()
-
-        self.datastream.StartAcquisition()
-        self.execute("AcquisitionStart")
-
-        self.acquiring = True
-
-    def stop_acquisition(self):
-        if not self.acquiring:
-            return
-
-        self.nodemap.FindNode("AcquisitionStop").Execute()
-        self.datastream.KillWait()
-        self.datastream.StopAcquisition(idsp.AcquisitionStopMode_Default)
-        self.datastream.Flush(idsp.DataStreamFlushMode_DiscardAll)
-
-        # Unlock parameters
-        self.nodemap.FindNode("TLParamsLocked").SetValue(0)
-
-        self.acquiring = False
-
-    def close(self):
-        self.stop_acquisition()
-        self._close_buffers()
-
     def get_attributes(self):
-        names = []
-
-        for node in self.nodemap.Nodes():
-            names += [node.DisplayName()]
+        names = [node.DisplayName() for node in self.nodemap.Nodes()]
 
         # TODO: get values too
         return names
@@ -157,18 +82,87 @@ class CameraIDS:
         self.nodemap.FindNode(command).Execute()
         self.nodemap.FindNode(command).WaitUntilDone()
 
-    def reset(self):
-        self._close_buffers()
+    def _initialize(self):
+        idsp.Library.Initialize()
+
+        self.acquiring = False
+        self.killed = False
+        self.capturing_threaded = False
+        # TODO:
+        self.fps = 1
+
+        self.nodemap = self.device.RemoteDevice().NodeMaps()[0]
+        self.datastream = self.device.DataStreams()[0]
+        self.image_converter = idsp_ipl.ImageConverter()
+
+        # TODO: Change from iterated capture calls to threading
+        self.capturing_thread = threading.Thread(target=self.capture_threaded, args=())
+
+    def _preallocate_conversion(self):
+        image_width = self.get_value("Width")
+        image_height = self.get_value("Height")
+        input_pixelformat = idsp_ipl.PixelFormat(self.get_entry("PixelFormat"))
+
+        # Pre-allocate conversion buffers to speed up first image conversion while the acquisition is running
+        # NOTE: Re-create the image converter, so old conversion buffers get freed
+        self.image_converter = idsp_ipl.ImageConverter()
+        self.image_converter.PreAllocateConversion(input_pixelformat, TARGET_PIXELFORMAT, image_width, image_height)
+
+    def setup_datastream(self):
+        self.datastream.OpenDataStream()
+
+        payload_size = self.get_value("PayloadSize")
+        num_buffers = self.datastream.NumBuffersAnnouncedMinRequired()
+        for _ in range(num_buffers):
+            buffer = self.datastream.AllocAndAnnounceBuffer(payload_size)
+            self.datastream.QueueBuffer(buffer)
+
+    def close_datastream(self):
+        for buffer in self.datastream.AnnouncedBuffers():
+            self.datastream.RevokeBuffer(buffer)
+
+        self.datastream.KillWait()
+        self.datastream.StopAcquisition(idsp.AcquisitionStopMode_Default)
+        self.datastream.Flush(idsp.DataStreamFlushMode_DiscardAll)
+
+    def start_acquisition(self):
+        if self.acquiring:
+            return
+
+        self.datastream = self.setup_datastream()
+
+        # TODO: Is this desired? From where control this?
+        max_framerate = self.get_max("AcquisitionFrameRate")
+        self.set_value("AcquisitionFrameRate", max_framerate)
+
+        # Lock parameters that should not be accessed during acquisition
+        self.set_value("TLParamsLocked", 1)
+
+        self._preallocate_conversion()
+
+        self.datastream.StartAcquisition()
+        self.execute("AcquisitionStart")
+
+        self.acquiring = True
+
+    def stop_acquisition(self):
+        if not self.acquiring:
+            return
+
+        self.nodemap.FindNode("AcquisitionStop").Execute()
+        self.close_datastream()
+
+        # Unlock parameters
+        self.nodemap.FindNode("TLParamsLocked").SetValue(0)
+
+        self.acquiring = False
+
+    def close(self):
+        self.stop_acquisition()
         self.execute("ResetToFactoryDefaults")
-
-    def load_settings(self, path):
-        self.nodemap.LoadFromFile(str(path))
-
-    def save_settings(self, path):
-        self.nodemap.StoreToFile(str(path))
+        idsp.Library.Close()
 
     def capture(self):
-        # TODO: Timestamp
         buffer = self.datastream.WaitForFinishedBuffer(5000)
 
         # NOTE: This still uses the buffer's underlying memory
@@ -194,13 +188,12 @@ class CameraIDS:
 
     def capture_threaded(self):
         while not self.killed:
-            image = self.capture()
-            return image
+            self.image = self.capture()
+            # TODO: Control framerate
+            time.sleep(1 / self.fps)
 
-    def is_capturing(self):
-        is_it = self.capturing_threaded
-        return is_it
+    def load_settings(self, path):
+        self.nodemap.LoadFromFile(str(path))
 
-    def is_acquiring(self):
-        is_it = self.acquiring
-        return is_it
+    def save_settings(self, path):
+        self.nodemap.StoreToFile(str(path))
