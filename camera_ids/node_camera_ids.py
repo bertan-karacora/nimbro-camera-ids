@@ -42,14 +42,12 @@ class NodeCameraIDS(Node):
         self.bridge = CvBridge()
         self.counter = 0
 
-        # TODO: Where control fps aquisition and/or fps publishing
+        # TODO: Node parameter interface for fps
         fps = 30
         self.timer = self.create_timer(1.0 / fps, self.timer_callback)
         self.publisher = self.create_publisher(Image, "camera_ids", 10)
 
         # self.add_on_set_parameters_callback(self.parameter_callback)
-
-        # TODO: Add ROS Params. Config and fps?
         # descriptor = ParameterDescriptor()
         # descriptor.name = "my_param_name"
         # descriptor.type = ParameterType.PARAMETER_INTEGER
@@ -86,13 +84,13 @@ class NodeCameraIDS(Node):
         return device
 
     def timer_callback(self):
-        img_ipl = self.camera.capture()
-
-        img = img_ipl.get_numpy_3D()
+        img = self.camera.image.get_numpy_3D()
         msg = self.bridge.cv2_to_imgmsg(img, "bgra8")
 
         self.publisher.publish(msg)
         self.counter += 1
+
+        # TODO: Add more message params? Use timestamp instead of counter. What other logging is desired?
         self.get_logger().info(f"Images published: {self.counter}")
 
     # def parameter_callback(self, parameters):
