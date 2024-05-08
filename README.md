@@ -27,3 +27,13 @@ source /opt/ros/humble/setup.bash
 source /ros2_ws/install/setup.bash
 ros2 run camera_ids publish --config default
 ```
+
+<!-- TODO: Camera config -->
+<!-- TODO: timestamps -->
+<!-- TODO: Use Launch instead of run -->
+<!-- TODO: Reattach reaction stuff-->
+
+<!-- 2024-05-08 -->
+<!-- TODO: Camera message fillen-->
+<!-- TODO: Camera info topic-->
+<!-- TODO: Node for registration of Lidar and camera-->
