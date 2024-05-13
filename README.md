@@ -29,16 +29,14 @@ ros2 run nimbro_camera_ids spin
 ```
 
 <!-- TODO: Camera config (in ids peak cockpit) -->
-<!-- TODO: Camera lense -->
 <!-- TODO: Compare with IDS peak cockpit, somehow worse? (Luis D.) -->
+<!-- TODO: Camera lense -->
 <!-- TODO: timestamps -->
 <!-- TODO: Use Launch instead of run -->
-<!-- TODO: Reattach reaction stuff-->
-<!-- TODO: Parameter-->
-<!-- TODO: Save original settings to file-->
+<!-- TODO: Reattach reaction stuff -->
 
 <!-- 2024-05-08 -->
-<!-- TODO: Camera message fillen-->
-<!-- TODO: Camera info topic-->
-<!-- TODO: Node for registration of Lidar and camera-->
-<!-- TODO: Ask Raphael for repos-->
+<!-- TODO: Node for registration of Lidar and camera -->
+<!-- TODO: Ask Raphael for repos -->
+
+<!-- TODO: Camera calibration (after it is mounted), e.g., https://wiki.ros.org/camera_calibration/Tutorials/MonocularCalibration -->
