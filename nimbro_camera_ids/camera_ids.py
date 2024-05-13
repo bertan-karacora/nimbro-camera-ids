@@ -87,7 +87,6 @@ class CameraIDS:
 
     def save_config(self, name_config):
         path_config = resources.files(__package__) / "configs" / f"{name_config}.cset"
-        print(path_config)
         self.nodemap.StoreToFile(str(path_config))
 
     def reset(self):
@@ -145,7 +144,6 @@ class CameraIDS:
     def close(self):
         self.stop_acquisition()
         self._revoke_buffers()
-        self.reset()
         idsp.Library.Close()
 
     def start_acquisition(self):
