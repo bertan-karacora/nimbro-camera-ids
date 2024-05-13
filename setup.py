@@ -1,6 +1,6 @@
 import setuptools
 
-NAME_PACKAGE = "camera_ids"
+NAME_PACKAGE = "nimbro_camera_ids"
 
 setuptools.setup(
     name=NAME_PACKAGE,
@@ -20,7 +20,7 @@ setuptools.setup(
     license="MIT",
     entry_points={
         "console_scripts": [
-            f"publish = {NAME_PACKAGE}.scripts.publish:main",
+            f"spin = {NAME_PACKAGE}.scripts.spin_camera_ids:main",
         ],
     },
 )
