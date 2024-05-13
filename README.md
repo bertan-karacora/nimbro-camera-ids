@@ -1,4 +1,4 @@
-# nimbro-ids-ros2
+# nimbro_camera_ids
 
 ## Links
 
@@ -11,7 +11,7 @@
 
 1. Install [ROS 2](https://docs.ros.org/en/humble/index.html), [IDS Peak](https://en.ids-imaging.com/files/downloads/ids-peak/readme/ids-peak-linux-readme-2.9.0_EN.html#first-start) and dependencies or use the [launcher](https://github.com/bertan-karacora/nimbro-ids-launch).
 
-2. Clone this Python package into your ROS 2 workspace, e.g., `/ros2_ws/src/nimbro-ids-ros2`.
+2. Clone this Python package into your ROS 2 workspace, e.g., `/colcon_ws/src/nimbro_camera_ids`.
 
 3. Run:
 
@@ -24,16 +24,21 @@
 
 ```bash
 source /opt/ros/humble/setup.bash
-source /ros2_ws/install/setup.bash
-ros2 run camera_ids publish --config default
+source /colcon_ws/install/setup.bash
+ros2 run nimbro_camera_ids spin
 ```
 
-<!-- TODO: Camera config -->
+<!-- TODO: Camera config (in ids peak cockpit) -->
+<!-- TODO: Camera lense -->
+<!-- TODO: Compare with IDS peak cockpit, somehow worse? (Luis D.) -->
 <!-- TODO: timestamps -->
 <!-- TODO: Use Launch instead of run -->
 <!-- TODO: Reattach reaction stuff-->
+<!-- TODO: Parameter-->
+<!-- TODO: Save original settings to file-->
 
 <!-- 2024-05-08 -->
 <!-- TODO: Camera message fillen-->
 <!-- TODO: Camera info topic-->
 <!-- TODO: Node for registration of Lidar and camera-->
+<!-- TODO: Ask Raphael for repos-->
