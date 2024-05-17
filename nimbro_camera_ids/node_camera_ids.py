@@ -14,7 +14,7 @@ from nimbro_utils.parameter_handler import ParameterHandler
 
 class NodeCameraIDS(Node):
     def __init__(self):
-        super().__init__("camera_ids_publisher")
+        super().__init__("node_camera_ids")
 
         self.bridge_cv = None
         self.camera_ids = None

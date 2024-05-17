@@ -178,7 +178,7 @@ class CameraIDS:
         self.acquiring = False
 
     def capture(self):
-        buffer = self.datastream.WaitForFinishedBuffer(500)
+        buffer = self.datastream.WaitForFinishedBuffer(5000)
 
         # NOTE: This still uses the buffer's underlying memory
         image = idsp_extension.BufferToImage(buffer)
