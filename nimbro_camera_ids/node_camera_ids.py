@@ -27,7 +27,7 @@ class NodeCameraIDS(Node):
         self._initialize()
 
     def _initialize(self):
-        self.camera = CameraIDS()
+        self.camera = CameraIDS(name_pixelformat_target="PixelFormatName_RGB8")
         self.get_logger().info(f"Device {self.camera} opened")
 
         self.bridge_cv = CvBridge()
@@ -162,7 +162,7 @@ class NodeCameraIDS(Node):
         image = image.get_numpy_3D()
 
         header = Header(stamp=self.get_clock().now().to_msg(), frame_id="camera_ids")
-        message = self.bridge_cv.cv2_to_imgmsg(image, encoding="bgra8", header=header)
+        message = self.bridge_cv.cv2_to_imgmsg(image, encoding="rgb8", header=header)
 
         self.publisher_image.publish(message)
         self.get_logger().info(f"Published image")

@@ -5,21 +5,21 @@ import ids_peak.ids_peak as idsp
 import ids_peak_ipl.ids_peak_ipl as idsp_ipl
 import ids_peak.ids_peak_ipl_extension as idsp_extension
 
-TARGET_PIXELFORMAT = idsp_ipl.PixelFormatName_BGRa8
-
 
 class CameraIDS:
-    def __init__(self, id_device=0):
+    def __init__(self, id_device=0, name_pixelformat_target="PixelFormatName_RGB8"):
         self.acquiring = None
         self.capturing_thread = None
-        self.capturing_threaded = None
+        self.converter_image = None
         self.datastream = None
         self.device = None
         self.device_manager = None
-        self.converter_image = None
         self.id_device = id_device
+        self.is_capturing = None
         self.killed = None
+        self.name_pixelformat_target = name_pixelformat_target
         self.nodemap = None
+        self.pixelformat_target = None
 
         self._initialize()
 
@@ -123,17 +123,26 @@ class CameraIDS:
 
         # NOTE: Re-create the image converter, so old conversion buffers get freed
         self.converter_image = idsp_ipl.ImageConverter()
-        self.converter_image.PreAllocateConversion(input_pixelformat, TARGET_PIXELFORMAT, image_width, image_height)
+        self.converter_image.PreAllocateConversion(input_pixelformat, self.pixelformat_target, image_width, image_height)
+
+    def _import_pixelformat(self, name_pixelformat):
+        if hasattr(idsp_ipl, name_pixelformat):
+            pixelformat = getattr(idsp_ipl, name_pixelformat)
+            if isinstance(pixelformat, int):
+                return pixelformat
+
+        raise ImportError(f"Pixelformat '{name_pixelformat}' not found")
 
     def _initialize(self):
         idsp.Library.Initialize()
 
+        self.pixelformat_target = self._import_pixelformat(self.name_pixelformat_target)
         self.device_manager = idsp.DeviceManager.Instance()
         self.device = self._open(self.device_manager, self.id_device)
 
         self.acquiring = False
         self.killed = False
-        self.capturing_threaded = False
+        self.is_capturing = False
         self.nodemap = self.device.RemoteDevice().NodeMaps()[0]
         self.datastream = self.device.DataStreams()[0].OpenDataStream()
         self.converter_image = idsp_ipl.ImageConverter()
@@ -185,7 +194,7 @@ class CameraIDS:
 
         # This creates a copy the image, so the buffer is free to use again after queuing
         # NOTE: Use `ImageConverter`, since the `ConvertTo` function re-allocates the conversion buffers on every call
-        image_converted = self.converter_image.Convert(image, TARGET_PIXELFORMAT)
+        image_converted = self.converter_image.Convert(image, self.pixelformat_target)
 
         self.datastream.QueueBuffer(buffer)
 
@@ -195,21 +204,21 @@ class CameraIDS:
         if not self.acquiring:
             raise ValueError("Camera is not in acquisition mode.")
 
-        if self.capturing_threaded:
+        if self.is_capturing:
             return
 
         self.capturing_thread = threading.Thread(target=self.capture_threaded, kwargs={"on_capture_callback": on_capture_callback})
         self.capturing_thread.start()
-        self.capturing_threaded = True
+        self.is_capturing = True
 
     def stop_capturing(self):
-        if not self.capturing_threaded:
+        if not self.is_capturing:
             return
 
         self.kill_thread()
         self.killed = False
 
-        self.capturing_threaded = False
+        self.is_capturing = False
 
     def kill_thread(self):
         self.killed = True
