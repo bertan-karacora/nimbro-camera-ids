@@ -20,10 +20,10 @@ AcquisitionMode	Continuous
 AcquisitionFrameCount	1
 SensorFrameTimeClocksTarget	34333333
 AcquisitionFrameRateTargetEnable	0
-SensorExposureTimeClocks	2574500
-SensorFrameTimeClocks	6804810
+SensorExposureTimeClocks	6523200
+SensorFrameTimeClocks	6867200
 SensorOperationModeRaw	Default
-DeviceLinkThroughputLimit	162000000
+DeviceLinkThroughputLimit	300000000
 EventNotification	{EventSelector=Error}	Off
 EventNotification	{EventSelector=CriticalError}	On
 EventNotification	{EventSelector=EventDropped}	On
@@ -58,9 +58,9 @@ PixelFormat	{ComponentSelector=Intensity}	BayerGR8
 ComponentSelector	Intensity
 ReverseX	0
 ReverseY	0
-Gain	{GainSelector=AnalogAll}	4.0
-Gain	{GainSelector=DigitalRed}	1.0
-Gain	{GainSelector=DigitalGreen}	1.0
-Gain	{GainSelector=DigitalBlue}	1.0
+Gain	{GainSelector=AnalogAll}	4
+Gain	{GainSelector=DigitalRed}	1.07323
+Gain	{GainSelector=DigitalGreen}	1
+Gain	{GainSelector=DigitalBlue}	2.69405
 GainSelector	AnalogAll
 BlackLevelInt	0
