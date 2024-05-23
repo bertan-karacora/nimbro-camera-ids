@@ -35,8 +35,7 @@ ros2 run nimbro_camera_ids spin
 <!-- TODO: Use Launch instead of run -->
 <!-- TODO: Reattach reaction stuff -->
 
-<!-- 2024-05-08 -->
 <!-- TODO: Node for registration of Lidar and camera -->
-<!-- TODO: Ask Raphael for repos -->
+<!-- TODO: Problem: Thread takes up up to 60% of a cpu core. If a notebook is running, framerate drops as the thread is not keeping up with the camera acquisition -->
 
 <!-- TODO: Camera calibration (after it is mounted), e.g., https://wiki.ros.org/camera_calibration/Tutorials/MonocularCalibration -->
