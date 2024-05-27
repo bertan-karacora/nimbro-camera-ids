@@ -4,6 +4,8 @@ import inspect
 from cv_bridge import CvBridge
 import numpy as np
 from rclpy.node import Node
+import rclpy.qos as qos
+from rclpy.callback_groups import ReentrantCallbackGroup
 from rcl_interfaces.msg import ParameterDescriptor, ParameterType, FloatingPointRange, SetParametersResult
 from sensor_msgs.msg import CameraInfo, RegionOfInterest, Image
 from std_msgs.msg import Header
@@ -31,8 +33,20 @@ class NodeCameraIDS(Node):
         self.get_logger().info(f"Device {self.camera} opened")
 
         self.bridge_cv = CvBridge()
-        self.publisher_info = self.create_publisher(CameraInfo, "camera_ids/camera_info", 10)
-        self.publisher_image = self.create_publisher(Image, "camera_ids/image_color", 10)
+
+        qos_profile = qos.QoSProfile(reliability=qos.ReliabilityPolicy.RELIABLE, history=qos.HistoryPolicy.KEEP_LAST, depth=3)
+        self.publisher_info = self.create_publisher(
+            CameraInfo,
+            "camera_ids/camera_info",
+            qos_profile=qos_profile,
+            callback_group=ReentrantCallbackGroup(),
+        )
+        self.publisher_image = self.create_publisher(
+            Image,
+            "camera_ids/image_color",
+            qos_profile=qos_profile,
+            callback_group=ReentrantCallbackGroup(),
+        )
         self.parameter_handler = ParameterHandler(self, verbose=False)
 
         self._setup_parameters()
