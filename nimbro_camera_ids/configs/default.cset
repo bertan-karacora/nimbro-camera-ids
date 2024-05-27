@@ -59,8 +59,8 @@ ComponentSelector	Intensity
 ReverseX	0
 ReverseY	0
 Gain	{GainSelector=AnalogAll}	4
-Gain	{GainSelector=DigitalRed}	1.07323
+Gain	{GainSelector=DigitalRed}	1
 Gain	{GainSelector=DigitalGreen}	1
-Gain	{GainSelector=DigitalBlue}	2.69405
+Gain	{GainSelector=DigitalBlue}	1.9
 GainSelector	AnalogAll
 BlackLevelInt	0
