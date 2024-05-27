@@ -3,6 +3,7 @@
 ## Links
 
 - [IDS peak manual](https://en.ids-imaging.com/download-details/1009698.html?os=linux&version=&bus=64)
+- [IDS peak IPL documentation](https://en.ids-imaging.com/manuals/ids-peak/ids-peak-ipl-documentation/2.9.0/en/index.html)
 - [Application notes for U3-36P1XLS Rev.1.2](https://www.1stvision.com/cameras/IDS/IDS-manuals/en/application-notes-u3-36px.html)
 - [Product website for U3-36P1XLS Rev.1.2](https://en.ids-imaging.com/store/u3-36p1xls-rev-1-2.html)
 - [Launcher](https://github.com/bertan-karacora/nimbro-ids-launch)
@@ -28,14 +29,23 @@ source /colcon_ws/install/setup.bash
 ros2 run nimbro_camera_ids spin
 ```
 
-<!-- TODO: Camera config (in ids peak cockpit) -->
-<!-- TODO: Compare with IDS peak cockpit, somehow worse? (Luis D.) -->
 <!-- TODO: Camera lense -->
-<!-- TODO: timestamps -->
+
+<!-- TODO: timestamps: Maybe linescan mode and listen to internal events: https://en.ids-imaging.com/manuals/ids-peak/ids-peak-user-manual/2.8.0/en/event-selector.html?q=events Or estimate from outside: Subtract delay between image acquisition and message creation and calibrate. Rolling shutter still a problem
+<!-- TODO: Auto features -->
+<!-- TODO: Color correction -->
+<!-- TODO: Hot pixels -->
+<!-- TODO: Transformations -->
+<!-- TODO: Gamma correction -->
+<!-- TODO: IPL library config (number of threads and stuff) -->
+<!-- TODO: Possibly color conversion and correction in parallel on a GPU? -->
+
+<!-- TODO: Camera config (in ids peak cockpit) -->
 <!-- TODO: Use Launch instead of run -->
 <!-- TODO: Reattach reaction stuff -->
-
 <!-- TODO: Node for registration of Lidar and camera -->
 <!-- TODO: Problem: Thread takes up up to 60% of a cpu core. If a notebook is running, framerate drops as the thread is not keeping up with the camera acquisition -->
+<!-- TODO: Observation: Even at full CPU usage, framerate does not drop. -> Problem is network related? -->
+<!-- TODO: Observation:Artifacts from infrared -->
 
-<!-- TODO: Camera calibration (after it is mounted), e.g., https://wiki.ros.org/camera_calibration/Tutorials/MonocularCalibration -->
+<!-- TODO: Camera calibration (after it is mounted) -->
