@@ -49,3 +49,5 @@ ros2 run nimbro_camera_ids spin
 <!-- TODO: Observation:Artifacts from infrared -->
 
 <!-- TODO: Camera calibration (after it is mounted) -->
+<!-- TODO: Gain, gamma, and lighting when calibrating -->
+<!-- TODO: How to adjust focal lense exactly when attaching lense -->
