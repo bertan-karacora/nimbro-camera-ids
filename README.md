@@ -6,7 +6,7 @@
 - [IDS peak IPL documentation](https://en.ids-imaging.com/manuals/ids-peak/ids-peak-ipl-documentation/2.9.0/en/index.html)
 - [Application notes for U3-36P1XLS Rev.1.2](https://www.1stvision.com/cameras/IDS/IDS-manuals/en/application-notes-u3-36px.html)
 - [Product website for U3-36P1XLS Rev.1.2](https://en.ids-imaging.com/store/u3-36p1xls-rev-1-2.html)
-- [Launcher](https://git.ais.uni-bonn.de/athome/nimbro-ids-launch)
+- [Launcher](https://git.ais.uni-bonn.de/athome/nimbro_ids_launch)
 
 ## Installation
 
