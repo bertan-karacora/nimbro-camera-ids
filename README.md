@@ -30,6 +30,11 @@ ros2 run nimbro_camera_ids spin
 ```
 
 <!-- TODO: Camera lense -->
+<!-- TODO: Color correction -->
+<!-- TODO: Config package -->
+<!-- TODO: White balance -->
+<!-- TODO: Calculate focal length (like https://en.ids-imaging.com/lensfinder.html) -->
+<!-- TODO: Change to gitlab -->
 
 <!-- TODO: timestamps: Maybe linescan mode and listen to internal events: https://en.ids-imaging.com/manuals/ids-peak/ids-peak-user-manual/2.8.0/en/event-selector.html?q=events Or estimate from outside: Subtract delay between image acquisition and message creation and calibrate. Rolling shutter still a problem
 <!-- TODO: Auto features -->
