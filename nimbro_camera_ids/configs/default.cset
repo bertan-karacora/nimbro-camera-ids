@@ -58,9 +58,9 @@ PixelFormat	{ComponentSelector=Intensity}	BayerGR8
 ComponentSelector	Intensity
 ReverseX	0
 ReverseY	0
-Gain	{GainSelector=AnalogAll}	4
+Gain	{GainSelector=AnalogAll}	3.75
 Gain	{GainSelector=DigitalRed}	1
 Gain	{GainSelector=DigitalGreen}	1
-Gain	{GainSelector=DigitalBlue}	1.9
+Gain	{GainSelector=DigitalBlue}	2.0
 GainSelector	AnalogAll
 BlackLevelInt	0
