@@ -24,17 +24,28 @@ class NodeCameraIDS(Node):
         self.parameter_handler = None
         self.publisher_info = None
         self.publisher_image = None
-        self.timer = None
 
-        self._initialize()
+        self._init()
 
-    def _initialize(self):
+    def _init(self):
+        self.parameter_handler = ParameterHandler(self, verbose=False)
+        self.bridge_cv = CvBridge()
+        self._setup_publishers()
+
         self.camera = CameraIDS(name_pixelformat_target="PixelFormatName_RGB8")
         self.get_logger().info(f"Device {self.camera} opened")
 
-        self.bridge_cv = CvBridge()
+        self.calibrate()
+        self._setup_parameters()
 
-        qos_profile = QoSProfile(reliability=ReliabilityPolicy.RELIABLE, history=HistoryPolicy.KEEP_LAST, depth=3)
+        self.camera.start_acquisition()
+        self.get_logger().info(f"Acquisition started")
+
+        self.camera.start_capturing(on_capture_callback=self.on_capture_callback)
+        self.get_logger().info(f"Capturing started")
+
+    def _setup_publishers(self):
+        qos_profile = QoSProfile(reliability=ReliabilityPolicy.BEST_EFFORT, history=HistoryPolicy.KEEP_LAST, depth=3)
         self.publisher_info = self.create_publisher(
             CameraInfo,
             "camera_ids/camera_info",
@@ -47,17 +58,6 @@ class NodeCameraIDS(Node):
             qos_profile=qos_profile,
             callback_group=ReentrantCallbackGroup(),
         )
-        self.parameter_handler = ParameterHandler(self, verbose=False)
-
-        self._setup_parameters()
-
-        self.camera.start_acquisition()
-        self.get_logger().info(f"Acquisition started")
-
-        self.calibrate()
-
-        self.camera.start_capturing(on_capture_callback=self.on_capture_callback)
-        self.get_logger().info(f"Capturing started")
 
     def _setup_parameters(self):
         self.add_on_set_parameters_callback(self.parameter_handler.parameter_callback)
@@ -92,7 +92,7 @@ class NodeCameraIDS(Node):
             ),
         )
         self.parameter_descriptors.append(descriptor)
-        self.declare_parameter(descriptor.name, self.camera.get_max("AcquisitionFrameRate"), descriptor)
+        self.declare_parameter(descriptor.name, 10, descriptor)
 
     def parameter_changed(self, parameter):
         func_name = f"update_{parameter.name}"
@@ -110,8 +110,26 @@ class NodeCameraIDS(Node):
         return success, reason
 
     def update_config(self, config_camera):
+        was_acquiring = self.camera.is_acquiring
+        was_capturing = self.camera.is_capturing
+        if was_capturing:
+            self.camera.stop_capturing()
+            self.get_logger().info(f"Capturing stopped")
+
+        if was_acquiring:
+            self.camera.stop_acquisition()
+            self.get_logger().info(f"Acquisition stopped")
+
         self.camera.load_config(config_camera)
         self.get_logger().info(f"Loaded config {config_camera}")
+
+        if was_acquiring:
+            self.camera.start_acquisition()
+            self.get_logger().info(f"Acquisition started")
+
+        if was_capturing:
+            self.camera.start_capturing(on_capture_callback=self.on_capture_callback)
+            self.get_logger().info(f"Capturing started")
 
         success = True
         reason = ""
@@ -170,7 +188,6 @@ class NodeCameraIDS(Node):
         )
 
         self.publisher_info.publish(message)
-        self.get_logger().info(f"Published info")
 
     def publish_image(self, image):
         image = image.get_numpy_3D()
@@ -179,7 +196,6 @@ class NodeCameraIDS(Node):
         message = self.bridge_cv.cv2_to_imgmsg(image, encoding="rgb8", header=header)
 
         self.publisher_image.publish(message)
-        self.get_logger().info(f"Published image")
 
     def on_capture_callback(self, image):
         self.publish_info()

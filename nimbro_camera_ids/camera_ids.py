@@ -5,11 +5,15 @@ import ids_peak.ids_peak as idsp
 import ids_peak_ipl.ids_peak_ipl as idsp_ipl
 import ids_peak.ids_peak_ipl_extension as idsp_extension
 
+from nimbro_camera_ids.manager_auto_features import ManagerAutoFeatures
+from nimbro_camera_ids.corrector_colors import CorrectorColors
+
 
 class CameraIDS:
     def __init__(self, id_device=0, name_pixelformat_target="PixelFormatName_RGB8"):
-        self.acquiring = None
+        self.is_acquiring = None
         self.capturing_thread = None
+        self.corrector_colors = None
         self.converter_image = None
         self.datastream = None
         self.device = None
@@ -17,17 +21,18 @@ class CameraIDS:
         self.id_device = id_device
         self.is_capturing = None
         self.killed = None
+        self.manager_auto_features = None
         self.name_pixelformat_target = name_pixelformat_target
         self.nodemap = None
         self.pixelformat_target = None
 
-        self._initialize()
+        self._init()
 
     def __del__(self):
         self.close()
 
     def __repr__(self):
-        r = f"{__package__}.{self.__class__.__name__}({self.device})"
+        r = f"{__package__}.{self.__class__.__name__}({self.id_device, self.name_pixelformat_target})"
         return r
 
     def __str__(self):
@@ -133,19 +138,21 @@ class CameraIDS:
 
         raise ImportError(f"Pixelformat '{name_pixelformat}' not found")
 
-    def _initialize(self):
+    def _init(self):
         idsp.Library.Initialize()
 
         self.pixelformat_target = self._import_pixelformat(self.name_pixelformat_target)
         self.device_manager = idsp.DeviceManager.Instance()
         self.device = self._open(self.device_manager, self.id_device)
 
-        self.acquiring = False
+        self.is_acquiring = False
         self.killed = False
         self.is_capturing = False
         self.nodemap = self.device.RemoteDevice().NodeMaps()[0]
         self.datastream = self.device.DataStreams()[0].OpenDataStream()
         self.converter_image = idsp_ipl.ImageConverter()
+        self.manager_auto_features = ManagerAutoFeatures(self, auto_exposure="off", auto_gain="continuous", auto_white_balance="continuous")
+        self.corrector_colors = CorrectorColors(self)
         self.capturing_thread = threading.Thread(target=self.capture_threaded)
 
         self._setup_buffers()
@@ -156,7 +163,7 @@ class CameraIDS:
         idsp.Library.Close()
 
     def start_acquisition(self):
-        if self.acquiring:
+        if self.is_acquiring:
             return
 
         # Lock parameters that should not be accessed during acquisition
@@ -167,10 +174,10 @@ class CameraIDS:
         self.datastream.StartAcquisition()
         self.execute("AcquisitionStart")
 
-        self.acquiring = True
+        self.is_acquiring = True
 
     def stop_acquisition(self):
-        if not self.acquiring:
+        if not self.is_acquiring:
             return
 
         self.nodemap.FindNode("AcquisitionStop").Execute()
@@ -184,7 +191,7 @@ class CameraIDS:
         # Unlock parameters
         self.nodemap.FindNode("TLParamsLocked").SetValue(0)
 
-        self.acquiring = False
+        self.is_acquiring = False
 
     def capture(self):
         buffer = self.datastream.WaitForFinishedBuffer(5000)
@@ -192,16 +199,17 @@ class CameraIDS:
         # NOTE: This still uses the buffer's underlying memory
         image = idsp_extension.BufferToImage(buffer)
 
-        # This creates a copy the image, so the buffer is free to use again after queuing
-        # NOTE: Use `ImageConverter`, since the `ConvertTo` function re-allocates the conversion buffers on every call
-        image_converted = self.converter_image.Convert(image, self.pixelformat_target)
+        # This creates a copy the image, so the buffer is free to use again after queueing
+        image = self.convert_image(image)
 
         self.datastream.QueueBuffer(buffer)
 
-        return image_converted
+        image = self.process_image(image)
+
+        return image
 
     def start_capturing(self, on_capture_callback=lambda *args: None):
-        if not self.acquiring:
+        if not self.is_acquiring:
             raise ValueError("Camera is not in acquisition mode.")
 
         if self.is_capturing:
@@ -228,3 +236,14 @@ class CameraIDS:
         while not self.killed:
             image = self.capture()
             on_capture_callback(image)
+
+    def convert_image(self, image):
+        # NOTE: Use `ImageConverter`, since the `ConvertTo` function re-allocates the conversion buffers on every call
+        image = self.converter_image.Convert(image, self.pixelformat_target)
+        return image
+
+    def process_image(self, image):
+        image = self.manager_auto_features.process_image(image)
+        image = self.corrector_colors.process_image(image)
+
+        return image
