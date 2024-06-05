@@ -41,7 +41,6 @@ ros2 run nimbro_camera_ids spin
 - Fix focal length with desired object distance and size (see https://en.ids-imaging.com/lensfinder.html)
 - Camera config (in ids peak cockpit)
 - Hot pixel correction
-- Fix auto exposure
 - Gamma correction
 - Timestamps: Maybe linescan mode and listen to internal events: https://en.ids-imaging.com/manuals/ids-peak/ids-peak-user-manual/2.8.0/en/event-selector.html?q=events Or estimate from outside: Subtract delay between image acquisition and message creation and calibrate. Rolling shutter would still be a problem.
 - IPL library config (number of threads and stuff)
