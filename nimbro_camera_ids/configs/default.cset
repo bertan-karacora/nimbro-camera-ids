@@ -20,8 +20,8 @@ AcquisitionMode	Continuous
 AcquisitionFrameCount	1
 SensorFrameTimeClocksTarget	34333333
 AcquisitionFrameRateTargetEnable	0
-SensorExposureTimeClocks	6523200
-SensorFrameTimeClocks	6867200
+SensorExposureTimeClocks	2575012
+SensorFrameTimeClocks	34335308
 SensorOperationModeRaw	Default
 DeviceLinkThroughputLimit	300000000
 EventNotification	{EventSelector=Error}	Off
@@ -61,6 +61,6 @@ ReverseY	0
 Gain	{GainSelector=AnalogAll}	3.75
 Gain	{GainSelector=DigitalRed}	1
 Gain	{GainSelector=DigitalGreen}	1
-Gain	{GainSelector=DigitalBlue}	2.0
+Gain	{GainSelector=DigitalBlue}	2
 GainSelector	AnalogAll
 BlackLevelInt	0

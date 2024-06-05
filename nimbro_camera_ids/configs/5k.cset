@@ -61,6 +61,6 @@ ReverseY	0
 Gain	{GainSelector=AnalogAll}	3.75
 Gain	{GainSelector=DigitalRed}	1
 Gain	{GainSelector=DigitalGreen}	1
-Gain	{GainSelector=DigitalBlue}	2.0
+Gain	{GainSelector=DigitalBlue}	2
 GainSelector	AnalogAll
 BlackLevelInt	0
