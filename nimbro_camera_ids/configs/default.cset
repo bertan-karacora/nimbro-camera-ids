@@ -20,8 +20,8 @@ AcquisitionMode	Continuous
 AcquisitionFrameCount	1
 SensorFrameTimeClocksTarget	34333333
 AcquisitionFrameRateTargetEnable	0
-SensorExposureTimeClocks	2575012
-SensorFrameTimeClocks	34335308
+SensorExposureTimeClocks	2574400
+SensorFrameTimeClocks	34336000
 SensorOperationModeRaw	Default
 DeviceLinkThroughputLimit	300000000
 EventNotification	{EventSelector=Error}	Off

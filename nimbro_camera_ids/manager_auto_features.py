@@ -68,6 +68,9 @@ class ManagerAutoFeatures:
         self.controller_white_balance.SetMode(self._mode_to_afl(value))
 
     def process_image(self, image):
-        self.manager.Process(image)
+        try:
+            self.manager.Process(image)
+        except:
+            pass
 
         return image
