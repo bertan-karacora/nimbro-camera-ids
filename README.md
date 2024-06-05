@@ -4,8 +4,10 @@
 
 - [IDS peak manual](https://en.ids-imaging.com/download-details/1009698.html?os=linux&version=&bus=64)
 - [IDS peak IPL documentation](https://en.ids-imaging.com/manuals/ids-peak/ids-peak-ipl-documentation/2.9.0/en/index.html)
+- [IDS peak AFL documentation](https://en.ids-imaging.com/manuals/ids-peak/ids-peak-afl-documentation/2.9.0/en/index.html)
 - [Application notes for U3-36P1XLS Rev.1.2](https://www.1stvision.com/cameras/IDS/IDS-manuals/en/application-notes-u3-36px.html)
 - [Product website for U3-36P1XLS Rev.1.2](https://en.ids-imaging.com/store/u3-36p1xls-rev-1-2.html)
+- [Product website for Fisheye E2328KRY lense](https://en.ids-imaging.com/store/u3-36p1xls-rev-1-2.html)
 - [Launcher](https://git.ais.uni-bonn.de/athome/nimbro_ids_launch)
 
 ## Installation
@@ -31,22 +33,21 @@ ros2 run nimbro_camera_ids spin
 
 ## TODO
 
+- Publish compressed image via image-transport
 - Setup IR filter
 - Check remaining IR artifacts
 - Color correction/calibration
 - Possibly color conversion and correction in parallel on a GPU?
 - Fix focal length with desired object distance and size (see https://en.ids-imaging.com/lensfinder.html)
 - Camera config (in ids peak cockpit)
-- White balance
 - Hot pixel correction
-- Auto features
+- Fix auto exposure
 - Gamma correction
 - Timestamps: Maybe linescan mode and listen to internal events: https://en.ids-imaging.com/manuals/ids-peak/ids-peak-user-manual/2.8.0/en/event-selector.html?q=events Or estimate from outside: Subtract delay between image acquisition and message creation and calibrate. Rolling shutter would still be a problem.
 - IPL library config (number of threads and stuff)
 - Use launchfile instead of ros2 run
 - Reattach reaction stuff
 - Registration of Lidar and camera
-- Problem: Framerate drops as the thread is not keeping up with the camera acquisition when there are multiple image topic subscribers. Check camera_info topic for comparison.
 - Use launchfile instead of ros2 run
 - Intrinsics calibration
-- Extrinsics calibration
+- Extrinsics calibration? Or hard-code using tf tree
