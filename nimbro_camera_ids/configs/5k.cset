@@ -1,0 +1,66 @@
+# {05D8C294-F295-4dfb-9D01-096BD04049F4}
+# GenApi persistence file (version 3.4.1)
+# Device = IDS_Imaging_Development_Systems_GmbH::U3_36Px_C --  -- Device version = 3.30.0 -- Product GUID = f3359ec6-b51c-ec66-9160-5f48b277719e -- Product version GUID = b8bb3f75-b0ef-c92a-8568-2c10285d7277
+TriggerMode	{TriggerSelector=FrameStart}	Off
+TriggerMode	{TriggerSelector=ExposureStart}	Off
+TriggerSelector	ExposureStart
+TriggerSource	{TriggerSelector=FrameStart}	Software
+TriggerSource	{TriggerSelector=ExposureStart}	Software
+TriggerSelector	ExposureStart
+TriggerActivation	{TriggerSelector=FrameStart}	RisingEdge
+TriggerActivation	{TriggerSelector=ExposureStart}	RisingEdge
+TriggerSelector	ExposureStart
+TriggerDelay	{TriggerSelector=FrameStart}	0
+TriggerDelay	{TriggerSelector=ExposureStart}	0
+TriggerSelector	ExposureStart
+TriggerDivider	{TriggerSelector=FrameStart}	1
+TriggerDivider	{TriggerSelector=ExposureStart}	1
+TriggerSelector	ExposureStart
+AcquisitionMode	Continuous
+AcquisitionFrameCount	1
+SensorFrameTimeClocksTarget	34333333
+AcquisitionFrameRateTargetEnable	0
+SensorExposureTimeClocks	6523200
+SensorFrameTimeClocks	6867200
+SensorOperationModeRaw	Default
+DeviceLinkThroughputLimit	300000000
+EventNotification	{EventSelector=Error}	Off
+EventNotification	{EventSelector=CriticalError}	On
+EventNotification	{EventSelector=EventDropped}	On
+EventSelector	EventDropped
+LEDTriggerSource	{LEDSelector=LEDStatus}	CameraStatus
+LEDSelector	LEDStatus
+LineMode	{LineSelector=Line2}	Input
+LineMode	{LineSelector=Line3}	Input
+LineSelector	Line0
+LineInverter	{LineSelector=Line2}	0
+LineInverter	{LineSelector=Line3}	0
+LineSelector	Line0
+UserOutputValue	{UserOutputSelector=UserOutput0}	0
+UserOutputValue	{UserOutputSelector=UserOutput1}	0
+UserOutputValue	{UserOutputSelector=UserOutput2}	0
+UserOutputValue	{UserOutputSelector=UserOutput3}	0
+UserOutputSelector	UserOutput0
+LineSource	{LineSelector=Line2}	Off
+LineSource	{LineSelector=Line3}	Off
+LineSelector	Line0
+SensorPixelSize	Bpp8
+Width	5112
+Height	1920
+OffsetX	0
+OffsetY	0
+BinningHorizontal	{BinningSelector=Sensor}	1
+BinningSelector	Sensor
+BinningVertical	{BinningSelector=Sensor}	1
+BinningSelector	Sensor
+TestPattern	Off
+PixelFormat	{ComponentSelector=Intensity}	BayerGR8
+ComponentSelector	Intensity
+ReverseX	0
+ReverseY	0
+Gain	{GainSelector=AnalogAll}	3.75
+Gain	{GainSelector=DigitalRed}	1
+Gain	{GainSelector=DigitalGreen}	1
+Gain	{GainSelector=DigitalBlue}	2.0
+GainSelector	AnalogAll
+BlackLevelInt	0
