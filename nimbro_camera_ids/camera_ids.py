@@ -117,6 +117,7 @@ class CameraIDS:
             self.datastream.QueueBuffer(buffer)
 
     def _revoke_buffers(self):
+        self.datastream.Flush(idsp.DataStreamFlushMode_DiscardAll)
         for buffer in self.datastream.AnnouncedBuffers():
             self.datastream.RevokeBuffer(buffer)
 
@@ -126,8 +127,6 @@ class CameraIDS:
         image_height = self.get_value("Height")
         input_pixelformat = idsp_ipl.PixelFormat(self.get_entry("PixelFormat"))
 
-        # NOTE: Re-create the image converter, so old conversion buffers get freed
-        self.converter_image = idsp_ipl.ImageConverter()
         self.converter_image.PreAllocateConversion(input_pixelformat, self.pixelformat_target, image_width, image_height)
 
     def _import_pixelformat(self, name_pixelformat):
@@ -155,11 +154,9 @@ class CameraIDS:
         self.corrector_colors = CorrectorColors(self)
         self.capturing_thread = threading.Thread(target=self.capture_threaded)
 
-        self._setup_buffers()
-
     def close(self):
+        self.stop_capturing()
         self.stop_acquisition()
-        self._revoke_buffers()
         idsp.Library.Close()
 
     def start_acquisition(self):
@@ -169,8 +166,8 @@ class CameraIDS:
         # Lock parameters that should not be accessed during acquisition
         self.set_value("TLParamsLocked", 1)
 
+        self._setup_buffers()
         self._preallocate_conversion()
-
         self.datastream.StartAcquisition()
         self.execute("AcquisitionStart")
 
@@ -180,16 +177,14 @@ class CameraIDS:
         if not self.is_acquiring:
             return
 
-        self.nodemap.FindNode("AcquisitionStop").Execute()
-
-        # Kill the datastream to exit out of pending `WaitForFinishedBuffer` calls
-        self.datastream.KillWait()
+        self.execute("AcquisitionStop")
         self.datastream.StopAcquisition(idsp.AcquisitionStopMode_Default)
-        # Discard all buffers from the acquisition engine. They remain in the announced buffer pool
-        self.datastream.Flush(idsp.DataStreamFlushMode_DiscardAll)
+        # NOTE: Re-create the image converter, so old conversion buffers get freed
+        self.converter_image = idsp_ipl.ImageConverter()
+        self._revoke_buffers()
 
         # Unlock parameters
-        self.nodemap.FindNode("TLParamsLocked").SetValue(0)
+        self.set_value("TLParamsLocked", 0)
 
         self.is_acquiring = False
 
@@ -224,8 +219,9 @@ class CameraIDS:
             return
 
         self.kill_thread()
-        self.killed = False
 
+        self.capturing_thread = None
+        self.killed = False
         self.is_capturing = False
 
     def kill_thread(self):

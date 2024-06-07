@@ -1,4 +1,5 @@
 import importlib.resources as resources
+import time
 
 from cv_bridge import CvBridge
 from rclpy.node import Node
@@ -18,9 +19,8 @@ class NodeCameraIDS(Node):
         super().__init__(node_name="camera_ids")
 
         self.bridge_cv = None
-        self.camera_ids = None
+        self.camera = None
         self.counter = None
-        self.intrinsics = None
         self.info = {}
         self.handler_parameters = None
         self.publisher_info = None
@@ -33,8 +33,8 @@ class NodeCameraIDS(Node):
         self.handler_parameters = ParameterHandler(self, verbose=False)
 
         self._init_publishers()
-        self._init_info()
         self._init_camera()
+        self._init_info()
         self._init_parameters()
 
     def _init_publishers(self):
@@ -134,7 +134,7 @@ class NodeCameraIDS(Node):
             self.get_logger().info(f"Acquisition stopped")
 
         self.camera.load_config(config_camera)
-        self.get_logger().info(f"Config {config_camera} loaded")
+        self.get_logger().info(f"Config '{config_camera}' loaded")
 
         if was_acquiring:
             self.camera.start_acquisition()
