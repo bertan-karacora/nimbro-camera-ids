@@ -9,6 +9,7 @@
 - [Product website for U3-36P1XLS Rev.1.2](https://en.ids-imaging.com/store/u3-36p1xls-rev-1-2.html)
 - [Product website for Fisheye E2328KRY lense](https://en.ids-imaging.com/store/u3-36p1xls-rev-1-2.html)
 - [Launcher](https://git.ais.uni-bonn.de/athome/nimbro_ids_launch)
+- [Kalibr (custom)](https://git.ais.uni-bonn.de/athome/kalibr_ds)
 
 ## Installation
 
@@ -33,20 +34,27 @@ ros2 run nimbro_camera_ids spin
 
 ## TODO
 
-- Publish compressed image via image-transport
-- Setup IR filter
-- Check remaining IR artifacts
-- Color correction/calibration
-- Possibly color conversion and correction in parallel on a GPU?
-- Fix focal length with desired object distance and size (see https://en.ids-imaging.com/lensfinder.html)
-- Camera config (in ids peak cockpit)
-- Hot pixel correction
-- Gamma correction
-- Timestamps: Maybe linescan mode and listen to internal events: https://en.ids-imaging.com/manuals/ids-peak/ids-peak-user-manual/2.8.0/en/event-selector.html?q=events Or estimate from outside: Subtract delay between image acquisition and message creation and calibrate. Rolling shutter would still be a problem.
-- IPL library config (number of threads and stuff)
-- Use launchfile instead of ros2 run
-- Reattach reaction stuff
-- Registration of Lidar and camera
-- Use launchfile instead of ros2 run
+- Setup IR filter + deal with remaining IR artifacts if any
+- Adjust and fix the focal distance of lense
 - Intrinsics calibration
 - Extrinsics calibration? Or hard-code using tf tree
+- Camera config (in ids peak cockpit)
+- Timestamps: Maybe linescan mode and listen to internal events: https://en.ids-imaging.com/manuals/ids-peak/ids-peak-user-manual/2.8.0/en/event-selector.html?q=events Or estimate from outside: Subtract delay between image acquisition and message creation and calibrate. Rolling shutter would still be a problem.
+- Use launchfile instead of ros2 run
+- Hot pixel correction
+- IPL library config (number of threads and stuff)
+- Gamma correction?
+- Publish compressed image via image-transport?
+- Color calibration? Possibly color conversion and correction in parallel on a GPU?
+- Reattach reaction stuff? Instead of watchdog in launcher?
+- Rectification using unprojection from [paper](https://arxiv.org/pdf/1807.08957)?
+
+## Calibration
+
+### Intrinsics
+
+1. Get [calibration target](https://github.com/ethz-asl/kalibr/wiki/calibration-targets)
+2. Record ros2 bag
+3. Convert using [rosbags](https://gitlab.com/ternaris/rosbags)
+4. Use [Kalibr](https://git.ais.uni-bonn.de/athome/kalibr_ds)
+5. Save result in [intrinsics.yaml](nimbro_camera_ids/resources/intrinsics.yaml)

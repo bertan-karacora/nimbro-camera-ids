@@ -1,14 +1,13 @@
 import importlib.resources as resources
-import inspect
 
 from cv_bridge import CvBridge
-import numpy as np
 from rclpy.node import Node
 from rclpy.qos import HistoryPolicy, ReliabilityPolicy, QoSProfile
 from rclpy.callback_groups import ReentrantCallbackGroup
 from rcl_interfaces.msg import ParameterDescriptor, ParameterType, FloatingPointRange
 from sensor_msgs.msg import CameraInfo, RegionOfInterest, Image
 from std_msgs.msg import Header
+import yaml
 
 from nimbro_camera_ids.camera_ids import CameraIDS
 from nimbro_utils.parameter_handler import ParameterHandler
@@ -16,27 +15,63 @@ from nimbro_utils.parameter_handler import ParameterHandler
 
 class NodeCameraIDS(Node):
     def __init__(self):
-        super().__init__("node_camera_ids")
+        super().__init__(node_name="camera_ids")
 
         self.bridge_cv = None
         self.camera_ids = None
         self.counter = None
-        self.parameter_handler = None
+        self.intrinsics = None
+        self.info = {}
+        self.handler_parameters = None
         self.publisher_info = None
         self.publisher_image = None
 
         self._init()
 
     def _init(self):
-        self.parameter_handler = ParameterHandler(self, verbose=False)
         self.bridge_cv = CvBridge()
-        self._setup_publishers()
+        self.handler_parameters = ParameterHandler(self, verbose=False)
 
+        self._init_publishers()
+        self._init_info()
+        self._init_camera()
+        self._init_parameters()
+
+    def _init_publishers(self):
+        qos_profile = QoSProfile(reliability=ReliabilityPolicy.BEST_EFFORT, history=HistoryPolicy.KEEP_LAST, depth=3)
+        self.publisher_info = self.create_publisher(CameraInfo, "camera_ids/camera_info", qos_profile=qos_profile, callback_group=ReentrantCallbackGroup())
+        self.publisher_image = self.create_publisher(Image, "camera_ids/image_color", qos_profile=qos_profile, callback_group=ReentrantCallbackGroup())
+
+    def _init_info(self):
+        self.info["height"] = self.camera.get_value("Height")
+        self.info["width"] = self.camera.get_value("Width")
+        self.info["binning_x"] = self.camera.get_value("BinningHorizontal")
+        self.info["binning_y"] = self.camera.get_value("BinningVertical")
+        self.info["roi"] = RegionOfInterest(
+            x_offset=self.camera.get_value("OffsetX"),
+            y_offset=self.camera.get_value("OffsetY"),
+            height=self.camera.get_value("Height"),
+            width=self.camera.get_value("Width"),
+            do_rectify=self.camera.get_value("OffsetX") != 0 or self.camera.get_value("OffsetY") != 0,
+        )
+
+        path_intrinsics = resources.files(__package__) / "resources" / "intrinsics.yaml"
+        intrinsics = self._read_yaml(path_intrinsics)
+        self.info["distortion_model"] = intrinsics["distortion_model"]
+        self.info["d"] = [intrinsics["xi"], intrinsics["alpha"]]
+        self.info["k"] = [intrinsics["fx"], 0.0, intrinsics["cx"]] + [0.0, intrinsics["fy"], intrinsics["cy"]] + [0.0, 0.0, 1.0]
+        self.info["r"] = [1.0, 0.0, 0.0] + [0.0, 1.0, 0.0] + [0.0, 0.0, 1.0]
+        self.info["p"] = [intrinsics["fx"], 0.0, intrinsics["cx"], 0.0] + [0.0, intrinsics["fy"], intrinsics["cy"], 0.0] + [0.0, 0.0, 1.0, 0.0]
+
+    def _read_yaml(self, path):
+        with open(path, "r") as stream:
+            data = yaml.safe_load(stream)
+
+        return data
+
+    def _init_camera(self):
         self.camera = CameraIDS(name_pixelformat_target="PixelFormatName_RGB8")
         self.get_logger().info(f"Device {self.camera} opened")
-
-        self.calibrate()
-        self._setup_parameters()
 
         self.camera.start_acquisition()
         self.get_logger().info(f"Acquisition started")
@@ -44,30 +79,15 @@ class NodeCameraIDS(Node):
         self.camera.start_capturing(on_capture_callback=self.on_capture_callback)
         self.get_logger().info(f"Capturing started")
 
-    def _setup_publishers(self):
-        qos_profile = QoSProfile(reliability=ReliabilityPolicy.BEST_EFFORT, history=HistoryPolicy.KEEP_LAST, depth=3)
-        self.publisher_info = self.create_publisher(
-            CameraInfo,
-            "camera_ids/camera_info",
-            qos_profile=qos_profile,
-            callback_group=ReentrantCallbackGroup(),
-        )
-        self.publisher_image = self.create_publisher(
-            Image,
-            "camera_ids/image_color",
-            qos_profile=qos_profile,
-            callback_group=ReentrantCallbackGroup(),
-        )
+    def _init_parameters(self):
+        self.add_on_set_parameters_callback(self.handler_parameters.parameter_callback)
 
-    def _setup_parameters(self):
-        self.add_on_set_parameters_callback(self.parameter_handler.parameter_callback)
+        self._init_parameter_config()
+        self._init_parameter_framerate()
 
-        self._setup_parameter_config()
-        self._setup_parameter_framerate()
+        self.handler_parameters.all_declared()
 
-        self.parameter_handler.all_declared()
-
-    def _setup_parameter_config(self):
+    def _init_parameter_config(self, value="default"):
         descriptor = ParameterDescriptor(
             name="config",
             type=ParameterType.PARAMETER_STRING,
@@ -75,9 +95,9 @@ class NodeCameraIDS(Node):
             read_only=False,
         )
         self.parameter_descriptors.append(descriptor)
-        self.declare_parameter(descriptor.name, "default", descriptor)
+        self.declare_parameter(descriptor.name, value, descriptor)
 
-    def _setup_parameter_framerate(self):
+    def _init_parameter_framerate(self, value=10):
         descriptor = ParameterDescriptor(
             name="framerate",
             type=ParameterType.PARAMETER_DOUBLE,
@@ -92,26 +112,19 @@ class NodeCameraIDS(Node):
             ),
         )
         self.parameter_descriptors.append(descriptor)
-        self.declare_parameter(descriptor.name, 10, descriptor)
+        self.declare_parameter(descriptor.name, value, descriptor)
 
     def parameter_changed(self, parameter):
-        func_name = f"update_{parameter.name}"
-
-        if not hasattr(NodeCameraIDS, func_name):
-            raise ValueError(f"Parameter {parameter.name} does not exist")
-
-        func_update = getattr(NodeCameraIDS, func_name)
-
-        if not inspect.isfunction(func_update):
-            raise ValueError(f"{func_update} is not a function")
-
+        func_update = getattr(NodeCameraIDS, f"update_{parameter.name}")
         success, reason = func_update(self, parameter.value)
 
         return success, reason
 
     def update_config(self, config_camera):
+        # Some config parameters cannot be changed when acquisition is running
         was_acquiring = self.camera.is_acquiring
         was_capturing = self.camera.is_capturing
+
         if was_capturing:
             self.camera.stop_capturing()
             self.get_logger().info(f"Capturing stopped")
@@ -121,7 +134,7 @@ class NodeCameraIDS(Node):
             self.get_logger().info(f"Acquisition stopped")
 
         self.camera.load_config(config_camera)
-        self.get_logger().info(f"Loaded config {config_camera}")
+        self.get_logger().info(f"Config {config_camera} loaded")
 
         if was_acquiring:
             self.camera.start_acquisition()
@@ -138,6 +151,7 @@ class NodeCameraIDS(Node):
 
     def update_framerate(self, framerate):
         self.camera.set_value("AcquisitionFrameRate", framerate)
+
         framerate_set = self.camera.get_value("AcquisitionFrameRate")
         self.get_logger().info(f"Framerate set to {framerate_set}")
 
@@ -146,60 +160,21 @@ class NodeCameraIDS(Node):
 
         return success, reason
 
-    def calibrate(self):
-        # TODO
-        # model_distortion: fisheye
-        # values_vector_distortion: [0.0, 0.0, 0.0, 0.0]
-        # values_matrix_intrinsic: [1.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0]
-        # values_matrix_rectification: [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0]
-        # values_matrix_projection: [1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0]
-
-        self.height = self.camera.get_value("Height")
-        self.width = self.camera.get_value("Width")
-
-        self.distortion_model = "fisheye"
-        self.values_vector_distortion = [0.0, 0.0, 0.0, 0.0]
-        self.values_matrix_intrinsic = [1.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0]
-        self.values_matrix_rectification = [0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0]
-        self.values_matrix_projection = [0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-        self.binning = (self.camera.get_value("BinningHorizontal"), self.camera.get_value("BinningVertical"))
-        self.roi = RegionOfInterest(
-            x_offset=self.camera.get_value("OffsetX"),
-            y_offset=self.camera.get_value("OffsetY"),
-            height=self.camera.get_value("Height"),
-            width=self.camera.get_value("Width"),
-            do_rectify=self.camera.get_value("OffsetX") != 0 or self.camera.get_value("OffsetY") != 0,
-        )
-
     def publish_info(self):
         header = Header(stamp=self.get_clock().now().to_msg(), frame_id="camera_ids")
-        message = CameraInfo(
-            header=header,
-            height=self.height,
-            width=self.width,
-            distortion_model=self.distortion_model,
-            d=self.values_vector_distortion,
-            k=self.values_matrix_intrinsic,
-            r=self.values_matrix_rectification,
-            p=self.values_matrix_projection,
-            binning_x=self.binning[0],
-            binning_y=self.binning[1],
-            roi=self.roi,
-        )
+        message = CameraInfo(header=header, **self.info)
 
         self.publisher_info.publish(message)
 
     def publish_image(self, image):
-        image = image.get_numpy_3D()
-
         header = Header(stamp=self.get_clock().now().to_msg(), frame_id="camera_ids")
-        message = self.bridge_cv.cv2_to_imgmsg(image, encoding="rgb8", header=header)
+        message = self.bridge_cv.cv2_to_imgmsg(image.get_numpy_3D(), header=header, encoding="rgb8")
 
         self.publisher_image.publish(message)
 
     def on_capture_callback(self, image):
-        self.publish_info()
         self.publish_image(image)
+        self.publish_info()
 
     def list_available_configs():
         path_configs = resources.files(__package__) / "configs"
@@ -207,8 +182,10 @@ class NodeCameraIDS(Node):
         configs_available = [str(f.parent.relative_to(path_configs) / f.stem) for f in files]
         return configs_available
 
-
-# count_frames_dropped = nodemap_datastream.FindNode("StreamDroppedFrameCount").Value()
-# count_frames_dropped = nodemap_datastream.FindNode("StreamDeliveredFrameCount").Value()
-# lost_before = nodemap_datastream.FindNode("StreamLostFrameCount").Value()
-# value = nodeMapSystem.FindNode("RegisteredReconnectEventsCount").Value()
+    def run_benchmark():
+        ...
+        # TODO: Benchmarking
+        # count_frames_dropped = nodemap_datastream.FindNode("StreamDroppedFrameCount").Value()
+        # count_frames_dropped = nodemap_datastream.FindNode("StreamDeliveredFrameCount").Value()
+        # lost_before = nodemap_datastream.FindNode("StreamLostFrameCount").Value()
+        # value = nodeMapSystem.FindNode("RegisteredReconnectEventsCount").Value()
