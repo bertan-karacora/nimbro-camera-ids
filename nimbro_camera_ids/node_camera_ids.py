@@ -1,5 +1,4 @@
 import importlib.resources as resources
-import time
 
 from cv_bridge import CvBridge
 from rclpy.node import Node
@@ -160,21 +159,22 @@ class NodeCameraIDS(Node):
 
         return success, reason
 
-    def publish_info(self):
-        header = Header(stamp=self.get_clock().now().to_msg(), frame_id="camera_ids")
+    def publish_info(self, time_ros2):
+        header = Header(stamp=time_ros2.to_msg(), frame_id="camera_ids")
         message = CameraInfo(header=header, **self.info)
 
         self.publisher_info.publish(message)
 
-    def publish_image(self, image):
-        header = Header(stamp=self.get_clock().now().to_msg(), frame_id="camera_ids")
+    def publish_image(self, image, time_ros2):
+        header = Header(stamp=time_ros2.to_msg(), frame_id="camera_ids")
         message = self.bridge_cv.cv2_to_imgmsg(image.get_numpy_3D(), header=header, encoding="rgb8")
 
         self.publisher_image.publish(message)
 
     def on_capture_callback(self, image):
-        self.publish_image(image)
-        self.publish_info()
+        time_ros2 = self.get_clock().now()
+        self.publish_image(image, time_ros2=time_ros2)
+        self.publish_info(time_ros2=time_ros2)
 
     def list_available_configs():
         path_configs = resources.files(__package__) / "configs"

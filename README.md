@@ -48,6 +48,7 @@ ros2 run nimbro_camera_ids spin
 - Color calibration? Possibly color conversion and correction in parallel on a GPU?
 - Reattach reaction stuff? Instead of watchdog in launcher?
 - Rectification using unprojection from [paper](https://arxiv.org/pdf/1807.08957)?
+- Benchmarking
 
 ## Calibration
 
