@@ -100,7 +100,7 @@ class NodeCameraIDS(Node):
         self.parameter_descriptors.append(descriptor)
         self.declare_parameter(descriptor.name, value, descriptor)
 
-    def _init_parameter_framerate(self, value=10):
+    def _init_parameter_framerate(self, value=10.0):
         descriptor = ParameterDescriptor(
             name="framerate",
             type=ParameterType.PARAMETER_DOUBLE,
