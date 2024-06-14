@@ -34,11 +34,8 @@ ros2 run nimbro_camera_ids spin
 
 ## TODO
 
-- Setup IR filter + deal with remaining IR artifacts if any
-- Adjust and fix the focal distance of lense
 - Intrinsics calibration
 - Extrinsics calibration? Or hard-code using tf tree
-- Camera config (in ids peak cockpit)
 - Timestamps: Maybe linescan mode and listen to internal events: https://en.ids-imaging.com/manuals/ids-peak/ids-peak-user-manual/2.8.0/en/event-selector.html?q=events Or estimate from outside: Subtract delay between image acquisition and message creation and calibrate. Rolling shutter would still be a problem.
 - Use launchfile instead of ros2 run
 - Hot pixel correction
@@ -47,7 +44,6 @@ ros2 run nimbro_camera_ids spin
 - Publish compressed image via image-transport?
 - Color calibration? Possibly color conversion and correction in parallel on a GPU?
 - Reattach reaction stuff? Instead of watchdog in launcher?
-- Rectification using unprojection from [paper](https://arxiv.org/pdf/1807.08957)?
 - Benchmarking
 
 ## Calibration
