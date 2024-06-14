@@ -150,7 +150,7 @@ class CameraIDS:
         self.nodemap = self.device.RemoteDevice().NodeMaps()[0]
         self.datastream = self.device.DataStreams()[0].OpenDataStream()
         self.converter_image = idsp_ipl.ImageConverter()
-        self.manager_auto_features = ManagerAutoFeatures(self, auto_exposure="continuous", auto_gain="continuous", auto_white_balance="continuous")
+        self.manager_auto_features = ManagerAutoFeatures(self, auto_exposure="off", auto_gain="continuous", auto_white_balance="continuous")
         self.corrector_colors = CorrectorColors(self)
         self.capturing_thread = threading.Thread(target=self.capture_threaded)
 
