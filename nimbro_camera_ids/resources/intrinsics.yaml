@@ -1,3 +1,9 @@
+height: 3840
+width: 5112
+binning_x: 2
+binning_y: 2
+offset_x: 0
+offset_y: 0
 distortion_model: double_sphere
 fx: 587.0397210507864
 fy: 585.510264377442

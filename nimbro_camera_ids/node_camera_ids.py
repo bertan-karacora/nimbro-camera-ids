@@ -42,20 +42,20 @@ class NodeCameraIDS(Node):
         self.publisher_image = self.create_publisher(Image, "camera_ids/image_color", qos_profile=qos_profile, callback_group=ReentrantCallbackGroup())
 
     def _init_info(self):
-        self.info["height"] = self.camera.get_value("Height")
-        self.info["width"] = self.camera.get_value("Width")
-        self.info["binning_x"] = self.camera.get_value("BinningHorizontal")
-        self.info["binning_y"] = self.camera.get_value("BinningVertical")
-        self.info["roi"] = RegionOfInterest(
-            x_offset=self.camera.get_value("OffsetX"),
-            y_offset=self.camera.get_value("OffsetY"),
-            height=self.camera.get_value("Height"),
-            width=self.camera.get_value("Width"),
-            do_rectify=self.camera.get_value("OffsetX") != 0 or self.camera.get_value("OffsetY") != 0,
-        )
-
         path_intrinsics = resources.files(__package__) / "resources" / "intrinsics.yaml"
         intrinsics = self._read_yaml(path_intrinsics)
+
+        self.info["height"] = intrinsics["height"]
+        self.info["width"] = intrinsics["width"]
+        self.info["binning_x"] = intrinsics["binning_x"]
+        self.info["binning_y"] = intrinsics["binning_y"]
+        self.info["roi"] = RegionOfInterest(
+            x_offset=intrinsics["offset_x"],
+            y_offset=intrinsics["offset_y"],
+            height=intrinsics["height"],
+            width=intrinsics["width"],
+            do_rectify=intrinsics["offset_x"] != 0 or intrinsics["offset_y"] != 0,
+        )
         self.info["distortion_model"] = intrinsics["distortion_model"]
         self.info["d"] = [intrinsics["xi"], intrinsics["alpha"]]
         self.info["k"] = [intrinsics["fx"], 0.0, intrinsics["cx"]] + [0.0, intrinsics["fy"], intrinsics["cy"]] + [0.0, 0.0, 1.0]
