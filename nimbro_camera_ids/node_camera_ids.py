@@ -256,13 +256,13 @@ class NodeCameraIDS(Node):
         return success, reason
 
     def publish_info(self, time_ros2):
-        header = Header(stamp=time_ros2.to_msg(), frame_id="camera_ids")
+        header = Header(stamp=time_ros2.to_msg(), frame_id="camera_ids_link")
         message = CameraInfo(header=header, **self.info)
 
         self.publisher_info.publish(message)
 
     def publish_image(self, image, time_ros2):
-        header = Header(stamp=time_ros2.to_msg(), frame_id="camera_ids")
+        header = Header(stamp=time_ros2.to_msg(), frame_id="camera_ids_link")
         message = self.bridge_cv.cv2_to_imgmsg(image.get_numpy_3D(), header=header, encoding="rgb8")
 
         self.publisher_image.publish(message)
