@@ -98,15 +98,19 @@ class CameraIDS:
     def reset(self):
         self.execute("ResetToFactoryDefaults")
 
-    def _open(self, device_manager, id_device):
-        device_manager.Update()
-        device_descriptors = device_manager.Devices()
+    def _open(self, id_device):
+        self.device_manager.Update()
+        device_descriptors = self.device_manager.Devices()
 
         if device_descriptors.empty() or len(device_descriptors) <= id_device:
-            raise RuntimeError("No device found")
+            raise Exception("No device found")
 
         device_descriptor = device_descriptors[id_device]
-        device = device_descriptor.OpenDevice(idsp.DeviceAccessType_Control)
+        if device_descriptor.IsOpenable(idsp.DeviceAccessType_Control):
+            device = device_descriptor.OpenDevice(idsp.DeviceAccessType_Control)
+        else:
+            raise Exception("Device found but not openable")
+
         return device
 
     def _setup_buffers(self):
@@ -143,7 +147,7 @@ class CameraIDS:
 
         self.pixelformat_target = self._import_pixelformat(self.name_pixelformat_target)
         self.device_manager = idsp.DeviceManager.Instance()
-        self.device = self._open(self.device_manager, self.id_device)
+        self.device = self._open(self.id_device)
 
         self.is_acquiring = False
         self.killed = False
@@ -231,12 +235,14 @@ class CameraIDS:
 
     def capture_threaded(self, on_capture_callback=lambda *args: None):
         while not self.killed:
+            self.device_manager.Update()
             try:
                 image = self.capture()
                 on_capture_callback(image)
             except Exception as e:
                 # TODO: Seems bad
-                sys.exit(1)
+                self.killed = True
+                raise Exception("Thread died")
 
     def convert_image(self, image):
         # NOTE: Use `ImageConverter`, since the `ConvertTo` function re-allocates the conversion buffers on every call

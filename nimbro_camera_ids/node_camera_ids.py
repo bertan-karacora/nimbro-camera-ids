@@ -36,6 +36,13 @@ class NodeCameraIDS(Node):
         self._init_info()
         self._init_parameters()
 
+        # TODO: Seems bad.
+        self.timer_device = self.create_timer(1.0, self.check_capturing_thread, callback_group=ReentrantCallbackGroup())
+
+    def check_capturing_thread(self):
+        if self.camera.is_capturing and self.camera.killed:
+            raise Exception("Thread died")
+
     def _init_publishers(self):
         qos_profile = QoSProfile(reliability=ReliabilityPolicy.BEST_EFFORT, history=HistoryPolicy.KEEP_LAST, depth=3)
         self.publisher_info = self.create_publisher(CameraInfo, "camera_ids/camera_info", qos_profile=qos_profile, callback_group=ReentrantCallbackGroup())
