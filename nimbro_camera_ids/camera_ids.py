@@ -230,8 +230,13 @@ class CameraIDS:
 
     def capture_threaded(self, on_capture_callback=lambda *args: None):
         while not self.killed:
-            image = self.capture()
-            on_capture_callback(image)
+            try:
+                image = self.capture()
+                on_capture_callback(image)
+            except Exception as e:
+                # Quick hack. TODO: Reattachment stuff
+                self.stop_capturing()
+                self.start_capturing()
 
     def convert_image(self, image):
         # NOTE: Use `ImageConverter`, since the `ConvertTo` function re-allocates the conversion buffers on every call
