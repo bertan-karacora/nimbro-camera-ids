@@ -235,7 +235,6 @@ class CameraIDS:
 
     def capture_threaded(self, on_capture_callback=lambda *args: None):
         while not self.killed:
-            self.device_manager.Update()
             try:
                 image = self.capture()
                 on_capture_callback(image)
