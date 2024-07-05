@@ -1,4 +1,5 @@
 import importlib.resources as resources
+import sys
 import threading
 
 import ids_peak.ids_peak as idsp
@@ -234,8 +235,8 @@ class CameraIDS:
                 image = self.capture()
                 on_capture_callback(image)
             except Exception as e:
-                # TODO: Reattachment stuff
-                raise RuntimeError("Thread died")
+                # TODO: Seems bad
+                sys.exit(1)
 
     def convert_image(self, image):
         # NOTE: Use `ImageConverter`, since the `ConvertTo` function re-allocates the conversion buffers on every call
