@@ -234,9 +234,8 @@ class CameraIDS:
                 image = self.capture()
                 on_capture_callback(image)
             except Exception as e:
-                # Quick hack. TODO: Reattachment stuff
-                self.stop_capturing()
-                self.start_capturing()
+                # TODO: Reattachment stuff
+                raise RuntimeError("Thread died")
 
     def convert_image(self, image):
         # NOTE: Use `ImageConverter`, since the `ConvertTo` function re-allocates the conversion buffers on every call
