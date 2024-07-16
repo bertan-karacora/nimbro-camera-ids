@@ -11,7 +11,7 @@ from nimbro_camera_ids.corrector_colors import CorrectorColors
 
 
 class CameraIDS:
-    def __init__(self, id_device=0, name_pixelformat_target="PixelFormatName_RGB8"):
+    def __init__(self, id_device=0, name_pixelformat_target="PixelFormatName_RGB8", gamma_correction=None):
         self.is_acquiring = None
         self.capturing_thread = None
         self.corrector_colors = None
@@ -19,6 +19,7 @@ class CameraIDS:
         self.datastream = None
         self.device = None
         self.device_manager = None
+        self.corrector_gamma = None
         self.id_device = id_device
         self.is_capturing = None
         self.killed = None
@@ -26,6 +27,7 @@ class CameraIDS:
         self.name_pixelformat_target = name_pixelformat_target
         self.nodemap = None
         self.pixelformat_target = None
+        self.gamma_correction = gamma_correction
 
         self._init()
 
@@ -155,6 +157,11 @@ class CameraIDS:
         self.nodemap = self.device.RemoteDevice().NodeMaps()[0]
         self.datastream = self.device.DataStreams()[0].OpenDataStream()
         self.converter_image = idsp_ipl.ImageConverter()
+
+        if self.gamma_correction is not None:
+            self.corrector_gamma = idsp_ipl.GammaCorrector()
+            self.corrector_gamma.SetGammaCorrectionValue(self.gamma_correction)
+
         self.manager_auto_features = ManagerAutoFeatures(self, auto_exposure="off", auto_gain="continuous", auto_white_balance="continuous")
         self.corrector_colors = CorrectorColors(self)
         self.capturing_thread = threading.Thread(target=self.capture_threaded)
@@ -251,5 +258,8 @@ class CameraIDS:
     def process_image(self, image):
         image = self.manager_auto_features.process_image(image)
         image = self.corrector_colors.process_image(image)
+
+        if self.corrector_gamma is not None:
+            self.corrector_gamma.ProcessInPlace(image)
 
         return image

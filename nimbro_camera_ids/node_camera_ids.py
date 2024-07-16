@@ -76,7 +76,7 @@ class NodeCameraIDS(Node):
         return data
 
     def _init_camera(self):
-        self.camera = CameraIDS(name_pixelformat_target="PixelFormatName_RGB8")
+        self.camera = CameraIDS(name_pixelformat_target="PixelFormatName_RGB8", gamma_correction=2.2)
         self.get_logger().info(f"Device {self.camera} opened")
 
         self.camera.start_acquisition()
