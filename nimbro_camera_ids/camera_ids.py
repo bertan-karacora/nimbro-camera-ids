@@ -257,9 +257,10 @@ class CameraIDS:
 
     def process_image(self, image):
         image = self.manager_auto_features.process_image(image)
-        image = self.corrector_colors.process_image(image)
 
         if self.corrector_gamma is not None:
             self.corrector_gamma.ProcessInPlace(image)
+
+        image = self.corrector_colors.process_image(image)
 
         return image
