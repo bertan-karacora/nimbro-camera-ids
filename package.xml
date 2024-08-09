@@ -1,16 +1,13 @@
 <?xml version="1.0"?>
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
-  <name>nimbro_camera_ids</name>
-  <version>0.0.1</version>
-  <description>ROS2 package for IDS camera</description>
-  <maintainer email="bertan-karacora@gmail.com">Bertan Karacora</maintainer>
-  <license>MIT</license>
+    <name>nimbro_camera_ids</name>
+    <version>0.0.1</version>
+    <description>ROS2 package for IDS camera</description>
+    <maintainer email="bertan-karacora@gmail.com">Bertan Karacora</maintainer>
+    <license>MIT</license>
 
-  <exec_depend>rclpy</exec_depend>
-  <exec_depend>std_msgs</exec_depend>
-
-  <export>
-    <build_type>ament_python</build_type>
-  </export>
+    <export>
+        <build_type>ament_python</build_type>
+    </export>
 </package>
