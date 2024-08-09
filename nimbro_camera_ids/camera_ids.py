@@ -1,5 +1,4 @@
 import importlib.resources as resources
-import sys
 import threading
 
 import ids_peak.ids_peak as idsp
