@@ -1,0 +1,41 @@
+# Docker
+docker-compose.yml
+.docker
+
+# pycache
+__pycache__
+**/__pycache__
+
+# C extensions
+*.so
+
+# Distribution
+.Python
+env
+build
+develop-eggs
+dist
+downloads
+eggs
+lib
+lib64
+parts
+sdist
+var
+*.egg-info
+.installed.cfg
+*.egg
+
+# Virtual environment
+.env/
+.venv/
+venv/
+
+# PyCharm
+.idea
+
+# git
+.git
+.gitattributes
+.gitignore
+.gitmodules
