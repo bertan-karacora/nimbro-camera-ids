@@ -115,6 +115,7 @@ RUN apt-get update -qq && \
 # Install tools
 RUN apt-get update -qq && \
     apt-get install -y -qq --no-install-recommends \
+    gettext-base \
     ros-jazzy-rmw-cyclonedds-cpp \
     && \
     apt-get autoremove -y -qq && \
