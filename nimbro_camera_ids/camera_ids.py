@@ -161,7 +161,7 @@ class CameraIDS:
             self.corrector_gamma = idsp_ipl.GammaCorrector()
             self.corrector_gamma.SetGammaCorrectionValue(self.gamma_correction)
 
-        self.manager_auto_features = ManagerAutoFeatures(self, auto_exposure="off", auto_gain="continuous", auto_white_balance="continuous")
+        self.manager_auto_features = ManagerAutoFeatures(self, mode_auto_exposure="off", mode_auto_gain="continuous", mode_auto_white_balance="continuous")
         self.corrector_colors = CorrectorColors(self)
         self.capturing_thread = threading.Thread(target=self.capture_threaded)
 
@@ -254,12 +254,15 @@ class CameraIDS:
         image = self.converter_image.Convert(image, self.pixelformat_target)
         return image
 
-    def process_image(self, image):
+    def process_image(self, image, use_inplace=True):
         image = self.manager_auto_features.process_image(image)
 
         if self.corrector_gamma is not None:
-            self.corrector_gamma.ProcessInPlace(image)
+            if use_inplace:
+                self.corrector_gamma.ProcessInPlace(image)
+            else:
+                image = self.corrector_gamma.Process(image)
 
-        image = self.corrector_colors.process_image(image)
+        image = self.corrector_colors.process_image(image, use_inplace=use_inplace)
 
         return image

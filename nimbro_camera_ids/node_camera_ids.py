@@ -36,7 +36,6 @@ class NodeCameraIDS(Node):
         self._init_info()
         self._init_parameters()
 
-        # TODO: Seems bad.
         self.timer_device = self.create_timer(1.0, self.check_capturing_thread, callback_group=ReentrantCallbackGroup())
 
     def check_capturing_thread(self):
@@ -44,7 +43,7 @@ class NodeCameraIDS(Node):
             raise Exception("Thread died")
 
     def _init_publishers(self):
-        qos_profile = QoSProfile(reliability=ReliabilityPolicy.BEST_EFFORT, history=HistoryPolicy.KEEP_LAST, depth=3)
+        qos_profile = QoSProfile(reliability=ReliabilityPolicy.BEST_EFFORT, history=HistoryPolicy.KEEP_LAST, depth=1)
         self.publisher_info = self.create_publisher(CameraInfo, "camera_ids/camera_info", qos_profile=qos_profile, callback_group=ReentrantCallbackGroup())
         self.publisher_image = self.create_publisher(Image, "camera_ids/image_color", qos_profile=qos_profile, callback_group=ReentrantCallbackGroup())
 
@@ -91,9 +90,9 @@ class NodeCameraIDS(Node):
         self._init_parameter_config()
         self._init_parameter_framerate()
         self._init_parameter_exposure_time()
-        self._init_parameter_auto_exposure()
-        self._init_parameter_auto_gain()
-        self._init_parameter_auto_white_balance()
+        self._init_parameter_mode_auto_exposure()
+        self._init_parameter_mode_auto_gain()
+        self._init_parameter_mode_auto_white_balance()
 
         self.handler_parameters.all_declared()
 
@@ -145,9 +144,9 @@ class NodeCameraIDS(Node):
         else:
             self.declare_parameter(descriptor.name, value, descriptor)
 
-    def _init_parameter_auto_exposure(self, value="off"):
+    def _init_parameter_mode_auto_exposure(self, value="off"):
         descriptor = ParameterDescriptor(
-            name="auto_exposure",
+            name="mode_auto_exposure",
             type=ParameterType.PARAMETER_STRING,
             description="Auto-exposure feature",
             read_only=False,
@@ -155,9 +154,9 @@ class NodeCameraIDS(Node):
         self.parameter_descriptors.append(descriptor)
         self.declare_parameter(descriptor.name, value, descriptor)
 
-    def _init_parameter_auto_gain(self, value="continuous"):
+    def _init_parameter_mode_auto_gain(self, value="continuous"):
         descriptor = ParameterDescriptor(
-            name="auto_gain",
+            name="mode_auto_gain",
             type=ParameterType.PARAMETER_STRING,
             description="Auto-gain feature",
             read_only=False,
@@ -165,9 +164,9 @@ class NodeCameraIDS(Node):
         self.parameter_descriptors.append(descriptor)
         self.declare_parameter(descriptor.name, value, descriptor)
 
-    def _init_parameter_auto_white_balance(self, value="continuous"):
+    def _init_parameter_mode_auto_white_balance(self, value="continuous"):
         descriptor = ParameterDescriptor(
-            name="auto_white_balance",
+            name="mode_auto_white_balance",
             type=ParameterType.PARAMETER_STRING,
             description="Auto-white-balance feature",
             read_only=False,
@@ -235,27 +234,27 @@ class NodeCameraIDS(Node):
 
         return success, reason
 
-    def update_auto_exposure(self, auto_exposure):
-        self.camera.manager_auto_features.auto_exposure = auto_exposure
-        self.get_logger().info(f"Auto-exposure set to {self.camera.manager_auto_features.auto_exposure}")
+    def update_mode_auto_exposure(self, mode_auto_exposure):
+        self.camera.manager_auto_features.mode_auto_exposure = mode_auto_exposure
+        self.get_logger().info(f"Auto-exposure set to {self.camera.manager_auto_features.mode_auto_exposure}")
 
         success = True
         reason = ""
 
         return success, reason
 
-    def update_auto_gain(self, auto_gain):
-        self.camera.manager_auto_features.auto_gain = auto_gain
-        self.get_logger().info(f"Auto-gain set to {self.camera.manager_auto_features.auto_gain}")
+    def update_mode_auto_gain(self, mode_auto_gain):
+        self.camera.manager_auto_features.mode_auto_gain = mode_auto_gain
+        self.get_logger().info(f"Auto-gain set to {self.camera.manager_auto_features.mode_auto_gain}")
 
         success = True
         reason = ""
 
         return success, reason
 
-    def update_auto_white_balance(self, auto_white_balance):
-        self.camera.manager_auto_features.auto_white_balance = auto_white_balance
-        self.get_logger().info(f"Auto-white-balance set to {self.camera.manager_auto_features.auto_white_balance}")
+    def update_mode_auto_white_balance(self, mode_auto_white_balance):
+        self.camera.manager_auto_features.mode_auto_white_balance = mode_auto_white_balance
+        self.get_logger().info(f"Auto-white-balance set to {self.camera.manager_auto_features.mode_auto_white_balance}")
 
         success = True
         reason = ""
