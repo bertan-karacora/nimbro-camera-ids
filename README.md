@@ -3,9 +3,9 @@
 ## Links
 
 - [Product website for U3-36P1XLS Rev.1.2](https://en.ids-imaging.com/store/u3-36p1xls-rev-1-2.html)
-- [Product website for Fisheye E2328KRY lense](https://en.ids-imaging.com/store/u3-36p1xls-rev-1-2.html)
+- [Product website for Fisheye E2328KRY lense](https://www.computar.com/products/e2328kry)
 - [Documentation and software for U3-36P1XLS-C Rev.1.2](https://en.ids-imaging.com/download-details/1009698.html?os=linux&version=&bus=64)
-- [IDS peak manual](https://en.ids-imaging.com/download-details/1009698.html?os=linux&version=&bus=64)
+- [IDS peak manual](https://en.ids-imaging.com/manuals/ids-peak/ids-peak-user-manual/2.9.0/en/index.html)
 - [IDS peak IPL documentation](https://en.ids-imaging.com/manuals/ids-peak/ids-peak-ipl-documentation/2.9.0/en/index.html)
 - [IDS peak AFL documentation](https://en.ids-imaging.com/manuals/ids-peak/ids-peak-afl-documentation/2.9.0/en/index.html)
 - [Application notes for U3-36P1XLS-C Rev.1.2](https://www.1stvision.com/cameras/IDS/IDS-manuals/en/application-notes-u3-36px.html)
@@ -57,15 +57,15 @@ ros2 run nimbro_camera_ids spin
 ## TODO
 
 - Setting USB buffer size need sudo permissions and cannot (definitely should not) be set from inside the Docker container. Set USB buffer size on robot permanently or every time with robot launch. Also add udev rule the somehow automatically?
-- Intrinsics calibration
-- Extrinsics calibration? Or hard-code using tf tree
-- Timestamps: Maybe linescan mode and listen to internal events: https://en.ids-imaging.com/manuals/ids-peak/ids-peak-user-manual/2.8.0/en/event-selector.html?q=events Or estimate from outside: Subtract delay between image acquisition and message creation and calibrate. Rolling shutter would still be a problem.
+- Intrinsics calibration can be improved
+- Extrinsics calibration
+- Color calibration?
+- Timestamps. Rolling shutter still a problem.
 - Use launchfile instead of ros2 run
 - Hot pixel correction
 - IPL library config (number of threads and stuff)
 - Publish compressed image via image-transport?
-- Color calibration? Possibly color conversion and correction in parallel on a GPU?
-- Benchmarking
+- Possibly color conversion and correction in parallel on a GPU?
 - Fix framerate on jetson
 
 ## Calibration
