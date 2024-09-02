@@ -2,14 +2,6 @@
 
 set -euo pipefail
 
-path_udev=/etc/udev/rules.d/99-ids-usb-access.rules
-
-string_udev="# Global U3V rule: Defined as class=EFh, subclass=02h, protocol=01h, ECN=U3V 
-# SUBSYSTEM==\"usb\", ATTR{bDeviceClass}==\"ef\", ATTR{bDeviceProtocol}==\"01\", ATTR{bDeviceSubClass}==\"02\", ATTR{configuration}==\"USB3 Vision\", MODE=\"0777\"
-
-# Also explicitly add current U3V
-SUBSYSTEM==\"usb\", ATTR{bDeviceClass}==\"ef\", ATTR{idVendor}==\"1409\", MODE=\"0777\""
-
 show_help() {
     echo "Usage:"
     echo "  ./add_udev_rule.sh"
@@ -26,8 +18,15 @@ parse_args() {
 }
 
 add_udev_rule() {
+    local path_udev=/etc/udev/rules.d/99-ids-usb-access.rules
+    local string_udev="# Global U3V rule: Defined as class=EFh, subclass=02h, protocol=01h, ECN=U3V 
+    # SUBSYSTEM==\"usb\", ATTR{bDeviceClass}==\"ef\", ATTR{bDeviceProtocol}==\"01\", ATTR{bDeviceSubClass}==\"02\", ATTR{configuration}==\"USB3 Vision\", MODE=\"0777\"
+
+    # Also explicitly add current U3V
+    SUBSYSTEM==\"usb\", ATTR{bDeviceClass}==\"ef\", ATTR{idVendor}==\"1409\", MODE=\"0777\""
+
     cat >"$path_udev" <<EOF
-$string
+$string_udev
 EOF
 }
 
