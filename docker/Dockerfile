@@ -1,9 +1,9 @@
-FROM amd64/ros:jazzy-perception AS base-amd64
+FROM amd64/ros:humble-perception AS base-amd64
 
 
 
 # ========================================
-FROM arm64v8/ros:jazzy-perception AS base-arm64
+FROM arm64v8/ros:humble-perception AS base-arm64
 
 
 
@@ -116,7 +116,7 @@ RUN apt-get update -qq && \
 RUN apt-get update -qq && \
     apt-get install -y -qq --no-install-recommends \
     gettext-base \
-    ros-jazzy-rmw-cyclonedds-cpp \
+    ros-humble-rmw-cyclonedds-cpp \
     && \
     apt-get autoremove -y -qq && \
     apt-get clean -qq && \
@@ -144,8 +144,8 @@ RUN apt-get update -qq && \
 RUN add-apt-repository -y ppa:deadsnakes/ppa
 RUN apt-get update -qq && \
     apt-get install -y -qq --no-install-recommends \
-    python3.12 \
-    python3.12-venv \
+    python3.10 \
+    python3.10-venv \
     && \
     apt-get autoremove -y -qq && \
     apt-get clean -qq && \
@@ -157,9 +157,9 @@ ENV PYTHONUNBUFFERED=1 \
     PIP_ROOT_USER_ACTION=ignore
 
 # Setup venv
-RUN python3.12 -m venv /opt/venv
+RUN python3.10 -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH" \
-    PYTHONPATH="/opt/venv/lib/python3.12/site-packages:$PYTHONPATH"
+    PYTHONPATH="/opt/venv/lib/python3.10/site-packages:$PYTHONPATH"
 RUN pip install --upgrade pip
 
 # Install dependencies
@@ -179,7 +179,7 @@ RUN git clone "https://$USERNAME_GITLAB:$TOKEN_GITLAB@git.ais.uni-bonn.de/athome
 COPY . /root/colcon_ws/src/nimbro_camera_ids
 
 WORKDIR /root/colcon_ws
-RUN source /opt/ros/jazzy/setup.bash && \
+RUN source /opt/ros/humble/setup.bash && \
     colcon build --symlink-install
 WORKDIR /root/colcon_ws/src/nimbro_camera_ids
 

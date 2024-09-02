@@ -20,14 +20,14 @@ git submodule update --init --remote --recursive
 
 ## Installation (not needed with Docker)
 
-1. Install [ROS 2](https://docs.ros.org/en/jazzy/index.html), [IDS Peak](https://en.ids-imaging.com/files/downloads/ids-peak/readme/ids-peak-linux-readme-2.9.0_EN.html#first-start) and dependencies as specified in the iDS Peak readme file.
+1. Install [ROS 2](https://docs.ros.org/en/humble/index.html), [IDS Peak](https://en.ids-imaging.com/files/downloads/ids-peak/readme/ids-peak-linux-readme-2.9.0_EN.html#first-start) and dependencies as specified in the iDS Peak readme file.
 
 2. Clone this Python package into your ROS 2 workspace, e.g., `/colcon_ws/src/nimbro_camera_ids`.
 
 3. Run:
 
     ```bash
-    source /opt/ros/jazzy/setup.bash
+    source /opt/ros/humble/setup.bash
     colcon build
     ```
 
@@ -49,7 +49,7 @@ docker/run.sh
 E.g., with a colcon workspace at `$HOME/colcon_ws`:
 
 ```bash
-source /opt/ros/jazzy/setup.bash
+source /opt/ros/humble/setup.bash
 source "$HOME/colcon_ws/install/setup.bash"
 ros2 run nimbro_camera_ids spin
 ```
