@@ -11,10 +11,10 @@ class CorrectorColors:
         ],
     )
 
-    def __init__(self, camera, name_matrix_correction="HQ", enabled=True):
+    def __init__(self, camera, name_matrix_correction="HQ", is_enabled=True):
         self.camera = camera
         self.corrector_colors = None
-        self.enabled = enabled
+        self.is_enabled = is_enabled
         self.matrix_correction = None
         self.name_matrix_correction = name_matrix_correction
 
@@ -49,12 +49,15 @@ class CorrectorColors:
         self.corrector_colors.SetColorCorrectionFactors(factors_correction)
 
     def enable(self):
-        self.enabled = True
+        self.is_enabled = True
 
     def disable(self):
-        self.enabled = False
+        self.is_enabled = False
 
-    def process_image(self, image):
-        if self.enabled:
-            self.corrector_colors.ProcessInPlace(image)
+    def process_image(self, image, use_inplace=True):
+        if self.is_enabled:
+            if use_inplace:
+                self.corrector_colors.ProcessInPlace(image)
+            else:
+                image = self.corrector_colors.Process(image)
         return image

@@ -5,7 +5,7 @@ NAME_PACKAGE = "nimbro_camera_ids"
 setuptools.setup(
     name=NAME_PACKAGE,
     version="0.0.1",
-    packages=setuptools.find_namespace_packages(exclude=["resource"]),
+    packages=setuptools.find_namespace_packages(exclude=["resource", "resources", "scripts", "libs", "docker"]),
     data_files=[
         ("share/ament_index/resource_index/packages", [f"resource/{NAME_PACKAGE}"]),
         (f"share/{NAME_PACKAGE}", ["package.xml"]),

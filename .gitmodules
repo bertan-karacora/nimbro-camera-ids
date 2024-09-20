@@ -1,0 +1,5 @@
+
+[submodule "libs/nimbro_config"]
+	branch = main
+	path = libs/nimbro_config
+	url = https://git.ais.uni-bonn.de/athome/nimbro_config
